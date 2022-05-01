@@ -18,12 +18,12 @@ class TeamLoaded extends TeamState {
 }
 
 class TeamDisplayed extends TeamState {
-  final Team team;
+  final Team? team;
 
   TeamDisplayed({required this.team});
 
   @override
-  List<Object> get props => [team];
+  List<Object> get props => [if (team != null) team!];
 }
 
 class TeamHaveMessage extends TeamState {

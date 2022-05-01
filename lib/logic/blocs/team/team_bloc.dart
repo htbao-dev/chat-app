@@ -25,15 +25,22 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
 
   final StreamController<List<User>> _selectStreamController =
       StreamController<List<User>>.broadcast();
+
   late final Stream<List<User>> selectStream;
   late final Stream<List<User>> searchStream;
   late final Stream<Message> messageStream;
   late final StreamSubscription _roomChangedSub;
+  late final StreamSubscription _subChangedSub;
+
+  List<Team>? listTeams;
+  Team? currentTeam;
+
   TeamBloc({required this.teamRepository, required this.userRepository})
       : super(TeamInitial()) {
     messageStream = _messageStreamController.stream.asBroadcastStream();
     selectStream = _selectStreamController.stream;
     searchStream = _searchStreamController.stream;
+
     _roomChangedSub = socket.roomChangedStream.listen((event) {
       emit(TeamHaveMessage(teamId: event['fields']['args'][1]['teamId']));
       try {
@@ -44,23 +51,47 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
         debugPrint(e.toString());
       }
     });
+    _subChangedSub = socket.subChangedStream.listen(_onSubChanged);
 
     on<LoadTeam>(loadTeam);
     on<DisplayTeam>(displayTeam);
     on<SearchFinish>(listUserLoaded);
   }
 
+  void _onSubChanged(event) async {
+    if (event['fields']['args'][0] == 'inserted') {
+      listTeams = null;
+      await Future.delayed(const Duration(seconds: 1)); //delay for server
+      add(LoadTeam());
+    } else if (event['fields']['args'][0] == 'removed') {
+      final String removedRoomId = event['fields']['args'][1]['rid'];
+      if (currentTeam?.roomId == removedRoomId) {
+        currentTeam = null;
+      }
+      for (Team team in listTeams ?? []) {
+        if (team.roomId == removedRoomId) {
+          listTeams!.remove(team);
+          add(LoadTeam());
+          break;
+        }
+      }
+    }
+    add(DisplayTeam(team: currentTeam));
+  }
+
   loadTeam(event, emit) async {
     try {
-      var teams = await teamRepository.listTeams();
-      print(teams.length);
-      emit(TeamLoaded(teams: teams));
+      listTeams ??= await teamRepository.listTeams();
+      print(listTeams?.length);
+      print('load');
+      emit(TeamLoaded(teams: listTeams!));
     } catch (e) {
       debugPrint(e.toString());
     }
   }
 
   displayTeam(event, emit) {
+    currentTeam = event.team;
     emit(TeamDisplayed(team: event.team));
   }
 
@@ -78,17 +109,17 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
     _selectStreamController.sink.add(_listSelected);
   }
 
-  Timer? _debounce;
+  Timer? _debounceInvite;
   void searchInvite({required String selector}) async {
-    if (_debounce?.isActive ?? false) _debounce!.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () async {
+    if (_debounceInvite?.isActive ?? false) _debounceInvite!.cancel();
+    _debounceInvite = Timer(const Duration(milliseconds: 500), () async {
       final usersSearch = await userRepository.getUsers(selector: selector);
       _listSearch = _hieu(usersSearch, _listSelected);
       _searchStreamController.sink.add(_listSearch);
     });
   }
 
-  void clearSearch() {
+  void clearSearchUser() {
     _listSearch = [];
     _listSelected = [];
   }
@@ -116,15 +147,17 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
   Future<void> inviteUser({required String teamRoomId}) async {
     await teamRepository.inviteUsers(
         teamRoomId: teamRoomId, users: _listSelected);
-    clearSearch();
+    clearSearchUser();
   }
 
   @override
   Future<void> close() {
+    listTeams = null;
     _roomChangedSub.cancel();
     _messageStreamController.close();
     _searchStreamController.close();
-    _debounce?.cancel();
+    _debounceInvite?.cancel();
+    _subChangedSub.cancel();
     return super.close();
   }
 }

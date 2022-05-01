@@ -22,8 +22,8 @@ class AuthSocket {
     // _coreSocket.call(
     //     '{"msg":"sub","id":"${StaticData.idRandom}","name":"stream-notify-user","params":["${auth.userId}/message",{"useCollection":false,"args":[]}]}');
     // //subscriptions-changed
-    // _coreSocket.call(
-    //     '{"msg":"sub","id":"${StaticData.idRandom}","name":"stream-notify-user","params":["${auth.userId}/subscriptions-changed",{"useCollection":false,"args":[]}]}');
+    _coreSocket.call(
+        '{"msg":"sub","id":"${StaticData.idRandom}","name":"stream-notify-user","params":["${auth.userId}/subscriptions-changed",{"useCollection":false,"args":[]}]}');
 
     //notification
     _coreSocket.call(

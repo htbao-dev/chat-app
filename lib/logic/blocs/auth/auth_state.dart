@@ -23,8 +23,8 @@ class AuthSuccess extends AuthState {
 class AuthError extends AuthState {
   // final int statusCode;
   final AuthStatus status;
-
-  AuthError({required this.status});
+  final String? errorMessage;
+  AuthError({required this.status, this.errorMessage});
 
   @override
   List<Object> get props => [status];

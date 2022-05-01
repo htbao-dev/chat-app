@@ -1,7 +1,9 @@
 import 'dart:convert';
 
 import 'package:chat_app/constants/enums.dart';
+import 'package:chat_app/data/data_providers/api/rocket_room_provider.dart';
 import 'package:chat_app/data/data_providers/api/rocket_team_provider.dart';
+import 'package:chat_app/data/data_providers/api/room_provider.dart';
 import 'package:chat_app/data/data_providers/api/team_provider.dart';
 import 'package:chat_app/data/data_providers/local_storage/team_localstorage.dart';
 import 'package:chat_app/data/data_providers/local_storage/team_sqlite.dart';
@@ -12,7 +14,30 @@ import 'package:flutter/widgets.dart';
 
 class TeamRepository {
   final TeamProvider _teamProvider = RocketTeamProvider();
+  final RoomProvider _roomProvider = RocketRoomProvider();
   final TeamLocalStorage _teamLocalStorage = TeamSqlite();
+
+  Future<List<User>> listMember(String teamId) async {
+    try {
+      if (StaticData.internetStatus == InternetStatus.disconnected) {
+        return [];
+      } else {
+        final auth = StaticData.auth!;
+        final rawData = await _teamProvider.listMembers(auth, teamId);
+        var decodeData = jsonDecode(rawData);
+        final users =
+            usersFromMap(decodeData['members'].map((e) => e['user']).toList());
+        // _teamLocalStorage.saveListMember(users);
+        print(users);
+        return users;
+      }
+    } catch (e, s) {
+      debugPrint(e.toString());
+      debugPrint(s.toString());
+      return [];
+    }
+  }
+
   Future<List<Team>> listTeams() async {
     try {
       if (StaticData.internetStatus == InternetStatus.disconnected) {
@@ -23,7 +48,6 @@ class TeamRepository {
         final rawData = await _teamProvider.listTeams(auth);
         var decodeData = jsonDecode(rawData);
         final teams = teamsFromMap(decodeData['teams']);
-        print(teams.length);
         _teamLocalStorage.saveTeams(teams);
         return teams;
       }
@@ -60,7 +84,7 @@ class TeamRepository {
     try {
       final auth = StaticData.auth!;
       final String rawData;
-      rawData = await _teamProvider.inviteUsers(auth, teamRoomId, users);
+      rawData = await _roomProvider.inviteUsers(auth, teamRoomId, users);
       var decodeData = jsonDecode(rawData);
       if (decodeData['success'] == true) {
         return true;

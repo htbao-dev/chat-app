@@ -9,12 +9,12 @@ class LoadTeam extends TeamEvent {
 }
 
 class DisplayTeam extends TeamEvent {
-  final Team team;
+  final Team? team;
 
   DisplayTeam({required this.team});
 
   @override
-  List<Object> get props => [team];
+  List<Object> get props => [if (team != null) team!];
 }
 
 class CreateTeam extends TeamEvent {

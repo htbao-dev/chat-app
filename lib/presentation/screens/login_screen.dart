@@ -120,7 +120,8 @@ class _LoginScreenState extends State<LoginScreen>
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         if (state is AuthError && state.status != AuthStatus.checkAuthFailed) {
-          String message = getAuthDisplayString(state.status);
+          String message =
+              getAuthDisplayString(state.status, state.errorMessage);
           return Text(
             message,
             style: const TextStyle(

@@ -4,6 +4,8 @@ import 'package:chat_app/constants/exceptions.dart';
 import 'package:chat_app/data/data_providers/api/rocket_server.dart';
 import 'package:chat_app/data/data_providers/api/room_provider.dart';
 import 'package:chat_app/data/models/auth.dart';
+import 'package:chat_app/data/models/user.dart';
+import 'package:chat_app/utils/static_data.dart';
 import 'package:http/http.dart' as http;
 
 class RocketRoomProvider extends RocketServer implements RoomProvider {
@@ -13,6 +15,11 @@ class RocketRoomProvider extends RocketServer implements RoomProvider {
   final _createChannelRoute = '/api/v1/channels.create';
   final _channelMembersRoute = '/api/v1/channels.members';
   final _groupMembersRoute = '/api/v1/groups.members';
+  final _inviteRoute = '/api/v1/method.call/addUsersToRoom';
+  final _deleteChannelRoute = '/api/v1/channels.delete';
+  final _deleteGroupRoute = '/api/v1/groups.delete';
+  final _leaveRoomRoute = '/api/v1/method.call/leaveRoom';
+
   @override
   Future<String> listRooms(
       Auth auth, String teamId, String? filter, String? type) async {
@@ -175,6 +182,93 @@ class RocketRoomProvider extends RocketServer implements RoomProvider {
           message: response.body,
         );
       }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future inviteUsers(Auth auth, String teamRoomId, List<User> users) async {
+    try {
+      String data = '';
+      for (int i = 0; i < users.length; i++) {
+        data += '"${users[i].username}"';
+        if (i != users.length - 1) {
+          data += ',';
+        }
+      }
+      final response = await http.post(
+        Uri.parse('$serverAddr$_inviteRoute'),
+        headers: {
+          'X-Auth-Token': auth.token,
+          'X-User-Id': auth.userId,
+        },
+        body: {
+          'message':
+              '{"msg":"method","id":"${StaticData.idRandom}","method":"addUsersToRoom","params":[{"rid":"$teamRoomId","users":[$data]}]}'
+        },
+      );
+      return response.body;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> deleteChannel(Auth auth, String roomId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$serverAddr$_deleteChannelRoute'),
+        headers: {
+          'X-Auth-Token': auth.token,
+          'X-User-Id': auth.userId,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'roomId': roomId,
+        }),
+      );
+      return response.body;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> deleteGroup(Auth auth, String roomId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$serverAddr$_deleteGroupRoute'),
+        headers: {
+          'X-Auth-Token': auth.token,
+          'X-User-Id': auth.userId,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'roomId': roomId,
+        }),
+      );
+      return response.body;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> leaveRoom(Auth auth, String roomId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$serverAddr$_leaveRoomRoute'),
+        headers: {
+          'X-Auth-Token': auth.token,
+          'X-User-Id': auth.userId,
+        },
+        body: {
+          'message':
+              '{"msg":"method","id":"${StaticData.idRandom}","method":"leaveRoom","params":["$roomId"]}'
+        },
+      );
+      return response.body;
     } catch (e) {
       rethrow;
     }

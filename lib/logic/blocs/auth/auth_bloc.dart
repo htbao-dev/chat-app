@@ -11,7 +11,7 @@ import 'package:chat_app/logic/blocs/app/app_bloc.dart';
 import 'package:chat_app/logic/blocs/internet_bloc.dart';
 import 'package:chat_app/utils/static_data.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/widgets.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -70,14 +70,13 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   loginSubmitedLogin(event, emit) async {
     emit(AuthLoading());
     try {
-      final auth = await authRepo
-          .loginWithUsernameAndPassword(event.username, event.password)
-          .timeout(kTimeout);
+      final auth = await authRepo.loginWithUsernameAndPassword(
+          event.username, event.password);
       _doWhenAuthSuccess(auth);
       emit(AuthSuccess());
     } on ServerException catch (e, s) {
-      print(e.message);
-      print(s);
+      debugPrint(e.message);
+      debugPrint(s.toString());
       if (e.statusCode == RequestStatusCode.timeout) {
         emit(AuthError(
           status: AuthStatus.timeout,
@@ -90,10 +89,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         status: AuthStatus.timeout,
       ));
     } catch (e) {
-      // ignore: avoid_print
-      print(e.toString());
+      debugPrint(e.toString());
       emit(AuthError(
         status: AuthStatus.unknown,
+        errorMessage: e.toString(),
       ));
     }
   }

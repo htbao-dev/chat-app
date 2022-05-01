@@ -153,7 +153,7 @@ class _InviteScreenState extends State<InviteScreen> {
 
   @override
   void dispose() {
-    widget.teamBloc.clearSearch();
+    widget.teamBloc.clearSearchUser();
     super.dispose();
   }
 }

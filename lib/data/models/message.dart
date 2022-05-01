@@ -4,7 +4,15 @@ import 'dart:convert';
 List<Message> messagesFromMap(List<dynamic> map) =>
     List<Message>.from(map.map((x) => Message.fromMap(x)));
 
-enum Type { removedUserFromTeam, addedUserToTeam }
+enum Type {
+  removedUserFromTeam,
+  addedUserToTeam,
+  userAddRoomToTeam,
+  userDeleteRoomFromTeam,
+  userLeftTeam,
+  addedUserToRoom,
+  unknown
+}
 
 class Message {
   Message({
@@ -43,6 +51,16 @@ class Message {
         type = Type.removedUserFromTeam;
       } else if (map['t'] == 'added-user-to-team') {
         type = Type.addedUserToTeam;
+      } else if (map['t'] == 'user-added-room-to-team') {
+        type = Type.userAddRoomToTeam;
+      } else if (map['t'] == 'user-deleted-room-from-team') {
+        type = Type.userDeleteRoomFromTeam;
+      } else if (map['t'] == 'ult') {
+        type = Type.userLeftTeam;
+      } else if (map['t'] == 'au') {
+        type = Type.addedUserToRoom;
+      } else {
+        type = Type.unknown;
       }
     }
     return Message(

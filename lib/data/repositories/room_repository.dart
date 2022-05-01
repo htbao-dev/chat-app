@@ -37,10 +37,8 @@ class RoomRepository {
         return rooms;
       }
     } catch (e, s) {
-      // ignore: avoid_print
-      print(e);
-      // ignore: avoid_print
-      print(s);
+      debugPrint(e.toString());
+      debugPrint(s.toString());
       final rooms = await _roomLocalStorage.listRooms(teamId);
       return rooms;
     }
@@ -94,8 +92,8 @@ class RoomRepository {
       if (decodeData['success'] == true) {
         if (!isPrivate) {
           final String roomId = decodeData['channel']['_id'];
-          final res = await _teamProvider.setRoomAutoJoin(auth, roomId, true);
-          print(res);
+          // final res =
+          await _teamProvider.setRoomAutoJoin(auth, roomId, true);
         }
         return CreateRoomStatus.success;
       } else if (decodeData['errorType'] == "error-duplicate-channel-name") {
@@ -133,6 +131,57 @@ class RoomRepository {
     } catch (e) {
       debugPrint(e.toString());
       return [];
+    }
+  }
+
+  Future addToRoom(Room room, List<User> users) async {
+    try {
+      final auth = StaticData.auth!;
+      final String rawData;
+      rawData = await _roomProvider.inviteUsers(auth, room.id, users);
+      var decodeData = jsonDecode(rawData);
+      if (decodeData['success'] == true) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
+    }
+  }
+
+  Future deleteRoom(Room room) async {
+    try {
+      final auth = StaticData.auth!;
+      final String rawData;
+      if (room.type == Room.privateRoom) {
+        rawData = await _roomProvider.deleteGroup(auth, room.id);
+      } else {
+        rawData = await _roomProvider.deleteChannel(auth, room.id);
+      }
+      var decodeData = jsonDecode(rawData);
+      if (decodeData['success'] == true) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
+    }
+  }
+
+  Future leaveRoom(Room room) async {
+    try {
+      final auth = StaticData.auth!;
+      final rawData = await _roomProvider.leaveRoom(auth, room.id);
+      var decodeData = jsonDecode(rawData);
+      if (decodeData['success'] == true) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
     }
   }
 }

@@ -52,13 +52,17 @@ class ListViewMessage extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
-              padding: const EdgeInsets.only(top: 5),
-              decoration: BoxDecoration(color: Colors.grey),
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                  color: Colors.grey.shade700,
+                  borderRadius: BorderRadius.circular(10)),
               child: _messageText(message),
             ),
+            const SizedBox(height: 10),
             if (imageUrl != null)
               Image.network(
                 imageUrl,
+                height: 400,
                 fit: BoxFit.cover,
                 headers: {
                   'X-Auth-Token': StaticData.auth!.token,
@@ -85,6 +89,21 @@ class ListViewMessage extends StatelessWidget {
           break;
         case Type.removedUserFromTeam:
           messageText = 'Team owner removed ${message.msg}';
+          break;
+        case Type.userAddRoomToTeam:
+          messageText = 'Team owner added ${message.msg} to team';
+          break;
+        case Type.userDeleteRoomFromTeam:
+          messageText = 'Team owner removed ${message.msg} from team';
+          break;
+        case Type.userLeftTeam:
+          messageText = '${message.msg} left team';
+          break;
+        case Type.addedUserToRoom:
+          messageText = '${message.msg} added to room';
+          break;
+        case Type.unknown:
+          messageText = 'unknown ${message.msg}';
           break;
       }
       return Text(

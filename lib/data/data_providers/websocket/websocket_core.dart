@@ -7,28 +7,24 @@ import 'package:web_socket_channel/web_socket_channel.dart';
 class Websocket extends RocketServer {
   static final Websocket _instance = Websocket._internal();
   late WebSocketChannel _channel;
-  final StreamController _notificationStreamController = StreamController();
-  final StreamController _roomChangedStreamController = StreamController();
-  final StreamController _roomMessageStreamController = StreamController();
-  late Stream _notificationStream;
-  late Stream _roomChangedStream;
-  late Stream _roomMessageStream;
-  Stream get roomChangedStream => _roomChangedStream;
-  Stream get notificationStream => _notificationStream;
-  Stream get roomMessageStream => _roomMessageStream;
+  final StreamController _notificationStreamController =
+      StreamController.broadcast();
+  final StreamController _roomChangedStreamController =
+      StreamController.broadcast();
+  final StreamController _subChangedStreamController =
+      StreamController.broadcast();
+  final StreamController _roomMessageStreamController =
+      StreamController.broadcast();
+  Stream get roomChangedStream => _roomChangedStreamController.stream;
+  Stream get notificationStream => _notificationStreamController.stream;
+  Stream get roomMessageStream => _roomMessageStreamController.stream;
+  Stream get subChangedStream => _subChangedStreamController.stream;
   late Stream _stream;
   factory Websocket() {
     return _instance;
   }
 
-  Websocket._internal() {
-    _notificationStream =
-        _notificationStreamController.stream.asBroadcastStream();
-    _roomChangedStream =
-        _roomChangedStreamController.stream.asBroadcastStream();
-    _roomMessageStream =
-        _roomMessageStreamController.stream.asBroadcastStream();
-  }
+  Websocket._internal();
 
   void connectServer() {
     _channel = WebSocketChannel.connect(Uri.parse(serverSocketAddr));
@@ -55,8 +51,13 @@ class Websocket extends RocketServer {
     } else if (event['collection'] == 'stream-notify-user' &&
         event['fields']['eventName'].toString().contains('rooms-changed')) {
       _roomChangedStreamController.sink.add(event);
+    } else if (event['collection'] == 'stream-notify-user' &&
+        event['fields']['eventName']
+            .toString()
+            .contains('subscriptions-changed')) {
+      _subChangedStreamController.sink.add(event);
     } else if (event['collection'] == 'stream-room-messages') {
-      _roomMessageStreamController.sink.add(event);
+      _roomChangedStreamController.sink.add(event);
     }
   }
 

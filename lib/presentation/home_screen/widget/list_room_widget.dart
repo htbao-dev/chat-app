@@ -1,16 +1,18 @@
 import 'package:chat_app/data/models/room.dart';
+import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/logic/blocs/room/room_bloc.dart';
+import 'package:chat_app/logic/blocs/team/team_bloc.dart';
 import 'package:chat_app/presentation/chat_screen/screen/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ListRoom extends StatefulWidget {
-  final String teamId;
-  final String teamRoomId;
+  final Team team;
+  // final TeamBloc teamBloc;
   const ListRoom({
-    required this.teamId,
-    required this.teamRoomId,
     Key? key,
+    required this.team,
+    // required this.teamBloc,
   }) : super(key: key);
 
   @override
@@ -22,7 +24,7 @@ class _ListRoomState extends State<ListRoom> {
   void initState() {
     super.initState();
     BlocProvider.of<RoomBloc>(context)
-        .add(LoadRooms(teamId: widget.teamId, teamRoomId: widget.teamRoomId));
+        .add(LoadRooms(teamId: widget.team.id, teamRoomId: widget.team.roomId));
   }
 
   @override
@@ -34,6 +36,8 @@ class _ListRoomState extends State<ListRoom> {
             builder: (_) => ChatScreen(
               room: state.room,
               roomBloc: BlocProvider.of<RoomBloc>(context),
+              team: widget.team,
+              // teamBloc: widget.teamBloc,
             ),
           ));
         }
