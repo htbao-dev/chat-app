@@ -98,9 +98,10 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
     // emit(RoomCreated(room: room));
   }
 
+  List<User>? listMember;
   void listMemberInRoom(Room room) async {
-    final usersSearch = await roomRepository.searchMember(room, '');
-    _roomMemberController.sink.add(usersSearch);
+    listMember ??= await roomRepository.searchMember(room, '');
+    _roomMemberController.sink.add(listMember!);
   }
 
   List<User> _listTeamMember = [];
@@ -122,6 +123,9 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
 
   Future<void> inviteUser({required Room room}) async {
     await roomRepository.addToRoom(room, _listSelected);
+    listMember = await roomRepository.searchMember(room, '');
+    _roomMemberController.sink.add(listMember!);
+
     clearSearchUser();
   }
 
@@ -137,6 +141,24 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
 
   Future deleteRoom(Room room) async {
     await roomRepository.deleteRoom(room);
+  }
+
+  Future<bool> kickRoom(Room room, String userId) async {
+    final ok = await roomRepository.kickRoom(room, userId);
+    if (ok) {
+      for (User user in listMember ?? []) {
+        if (user.id == userId) {
+          listMember!.remove(user);
+          break;
+        }
+      }
+
+      _roomMemberController.sink.add(listMember!);
+      return true;
+    }
+
+    _roomMemberController.sink.add(listMember!);
+    return false;
   }
 
   @override

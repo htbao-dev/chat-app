@@ -102,6 +102,9 @@ class ListViewMessage extends StatelessWidget {
         case Type.addedUserToRoom:
           messageText = '${message.msg} added to room';
           break;
+        case Type.removedUserFromRoom:
+          messageText = '${message.msg} removed from room';
+          break;
         case Type.unknown:
           messageText = 'unknown ${message.msg}';
           break;

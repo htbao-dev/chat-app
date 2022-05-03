@@ -28,7 +28,6 @@ class TeamRepository {
         final users =
             usersFromMap(decodeData['members'].map((e) => e['user']).toList());
         // _teamLocalStorage.saveListMember(users);
-        print(users);
         return users;
       }
     } catch (e, s) {

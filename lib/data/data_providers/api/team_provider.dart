@@ -1,5 +1,4 @@
 import 'package:chat_app/data/models/auth.dart';
-import 'package:chat_app/data/models/user.dart';
 
 abstract class TeamProvider {
   Future<String> listTeams(Auth auth);

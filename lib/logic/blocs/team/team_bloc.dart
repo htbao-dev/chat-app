@@ -42,8 +42,8 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
     searchStream = _searchStreamController.stream;
 
     _roomChangedSub = socket.roomChangedStream.listen((event) {
-      emit(TeamHaveMessage(teamId: event['fields']['args'][1]['teamId']));
       try {
+        emit(TeamHaveMessage(teamId: event['fields']['args'][1]['teamId']));
         final message =
             Message.fromMap(event['fields']['args'][1]['lastMessage']);
         _messageStreamController.sink.add(message);
@@ -82,8 +82,6 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
   loadTeam(event, emit) async {
     try {
       listTeams ??= await teamRepository.listTeams();
-      print(listTeams?.length);
-      print('load');
       emit(TeamLoaded(teams: listTeams!));
     } catch (e) {
       debugPrint(e.toString());

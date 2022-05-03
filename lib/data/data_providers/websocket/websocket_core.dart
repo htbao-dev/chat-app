@@ -57,7 +57,8 @@ class Websocket extends RocketServer {
             .contains('subscriptions-changed')) {
       _subChangedStreamController.sink.add(event);
     } else if (event['collection'] == 'stream-room-messages') {
-      _roomChangedStreamController.sink.add(event);
+      print(event);
+      _roomMessageStreamController.sink.add(event);
     }
   }
 

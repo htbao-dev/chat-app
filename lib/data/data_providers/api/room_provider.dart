@@ -22,4 +22,6 @@ abstract class RoomProvider {
   Future<String> deleteGroup(Auth auth, String roomId);
   Future<String> deleteChannel(Auth auth, String roomId);
   Future<String> leaveRoom(Auth auth, String roomId);
+  Future<String> kickGroup(Auth auth, String roomId, String userId);
+  Future<String> kickChannel(Auth auth, String roomId, String userId);
 }

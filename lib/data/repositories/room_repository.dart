@@ -184,6 +184,26 @@ class RoomRepository {
       return false;
     }
   }
+
+  Future<bool> kickRoom(Room room, String userId) async {
+    try {
+      final auth = StaticData.auth!;
+      final String rawData;
+      if (room.type == Room.privateRoom) {
+        rawData = await _roomProvider.kickGroup(auth, room.id, userId);
+      } else {
+        rawData = await _roomProvider.kickChannel(auth, room.id, userId);
+      }
+      var decodeData = jsonDecode(rawData);
+      if (decodeData['success'] == true) {
+        return true;
+      }
+      return false;
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
+    }
+  }
 }
 
 enum CreateRoomStatus {

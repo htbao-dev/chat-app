@@ -11,6 +11,7 @@ enum Type {
   userDeleteRoomFromTeam,
   userLeftTeam,
   addedUserToRoom,
+  removedUserFromRoom,
   unknown
 }
 
@@ -59,6 +60,8 @@ class Message {
         type = Type.userLeftTeam;
       } else if (map['t'] == 'au') {
         type = Type.addedUserToRoom;
+      } else if (map['t'] == 'ru') {
+        type = Type.removedUserFromRoom;
       } else {
         type = Type.unknown;
       }

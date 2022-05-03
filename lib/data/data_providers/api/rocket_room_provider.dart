@@ -19,6 +19,8 @@ class RocketRoomProvider extends RocketServer implements RoomProvider {
   final _deleteChannelRoute = '/api/v1/channels.delete';
   final _deleteGroupRoute = '/api/v1/groups.delete';
   final _leaveRoomRoute = '/api/v1/method.call/leaveRoom';
+  final _kickGroupRoute = '/api/v1/groups.kick';
+  final _kickChannelRoute = '/api/v1/channels.kick';
 
   @override
   Future<String> listRooms(
@@ -267,6 +269,48 @@ class RocketRoomProvider extends RocketServer implements RoomProvider {
           'message':
               '{"msg":"method","id":"${StaticData.idRandom}","method":"leaveRoom","params":["$roomId"]}'
         },
+      );
+      return response.body;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> kickChannel(Auth auth, String roomId, String userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$serverAddr$_kickChannelRoute'),
+        headers: {
+          'X-Auth-Token': auth.token,
+          'X-User-Id': auth.userId,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'roomId': roomId,
+          'userId': userId,
+        }),
+      );
+      return response.body;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  @override
+  Future<String> kickGroup(Auth auth, String roomId, String userId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$serverAddr$_kickGroupRoute'),
+        headers: {
+          'X-Auth-Token': auth.token,
+          'X-User-Id': auth.userId,
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          'roomId': roomId,
+          'userId': userId,
+        }),
       );
       return response.body;
     } catch (e) {

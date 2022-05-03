@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 class ListRoomMember extends StatelessWidget {
   final RoomBloc roomBloc;
   final Room room;
-  const ListRoomMember({Key? key, required this.roomBloc, required this.room})
+  final Function(User)? onLongPress;
+  const ListRoomMember(
+      {Key? key, required this.roomBloc, required this.room, this.onLongPress})
       : super(key: key);
 
   @override
@@ -22,7 +24,9 @@ class ListRoomMember extends StatelessWidget {
               title: Text(data[index].name ?? data[index].username),
               subtitle: Text(data[index].username,
                   style: const TextStyle(color: Colors.white70)),
-              onTap: () {},
+              onLongPress: () {
+                if (onLongPress != null) onLongPress!(data[index]);
+              },
             ),
             itemCount: data.length,
             shrinkWrap: true,

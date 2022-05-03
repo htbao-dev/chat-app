@@ -1,7 +1,6 @@
 import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/logic/blocs/room/room_bloc.dart';
-import 'package:chat_app/logic/blocs/team/team_bloc.dart';
 import 'package:chat_app/presentation/chat_screen/screen/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

@@ -17,7 +17,6 @@ class TeamIntroWidget extends StatelessWidget {
     return BlocBuilder<TeamBloc, TeamState>(
       buildWhen: (previous, current) => current is TeamDisplayed,
       builder: (context, state) {
-        print(state);
         if (state is TeamDisplayed) {
           if (state.team != null) {
             return _Intro(

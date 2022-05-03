@@ -47,7 +47,6 @@ class _ListTeam extends StatelessWidget {
       buildWhen: (previous, current) => current is TeamLoaded,
       builder: (context, state) {
         if (state is TeamLoaded) {
-          print(state.teams);
           final listTeam = state.teams;
           return ListView.builder(
             shrinkWrap: true,
