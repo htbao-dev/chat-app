@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/user.dart';
 import 'package:chat_app/logic/blocs/room/room_bloc.dart';
@@ -15,7 +17,7 @@ class ListRoomMember extends StatelessWidget {
   Widget build(BuildContext context) {
     roomBloc.listMemberInRoom(room);
     return StreamBuilder<List<User>>(
-        stream: roomBloc.searchStream,
+        stream: roomBloc.roomMemberStream,
         builder: (context, snapshot) {
           final data = snapshot.data ?? [];
           return ListView.builder(

@@ -23,6 +23,7 @@ class ListViewMessage extends StatelessWidget {
         return ListView.builder(
           addAutomaticKeepAlives: true,
           reverse: true,
+          padding: EdgeInsets.zero,
           itemCount: listMessage.length,
           itemBuilder: (context, index) {
             return _listTile(listMessage[index]);
@@ -42,11 +43,12 @@ class ListViewMessage extends StatelessWidget {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 5),
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 8, vertical: 0),
         title: Text(
           message.user.name ?? message.user.username,
-          style: const TextStyle(fontWeight: FontWeight.bold),
+          style: const TextStyle(fontWeight: FontWeight.w400),
         ),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -73,7 +75,7 @@ class ListViewMessage extends StatelessWidget {
         ),
         leading: const Icon(
           Icons.account_circle,
-          size: 40,
+          size: 50,
         ),
         textColor: Colors.white,
       ),

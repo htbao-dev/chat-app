@@ -47,6 +47,7 @@ class _ListRoomState extends State<ListRoom> {
           final publicRooms = state.publicRooms;
           final privateRooms = state.privateRooms;
           return ListView(
+            padding: EdgeInsets.zero,
             children: [
               _generalRoom(context, state.generalRoom),
               _groupRoom('public rooms', rooms: publicRooms),

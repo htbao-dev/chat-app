@@ -22,10 +22,12 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
       StreamController<Message>();
   final StreamController<List<User>> _searchStreamController =
       StreamController<List<User>>.broadcast();
-
   final StreamController<List<User>> _selectStreamController =
       StreamController<List<User>>.broadcast();
+  final StreamController<List<User>> _teamMemberController =
+      StreamController<List<User>>.broadcast();
 
+  late final Stream<List<User>> teamMemberStream;
   late final Stream<List<User>> selectStream;
   late final Stream<List<User>> searchStream;
   late final Stream<Message> messageStream;
@@ -40,6 +42,7 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
     messageStream = _messageStreamController.stream.asBroadcastStream();
     selectStream = _selectStreamController.stream;
     searchStream = _searchStreamController.stream;
+    teamMemberStream = _teamMemberController.stream;
 
     _roomChangedSub = socket.roomChangedStream.listen((event) {
       try {
@@ -56,6 +59,18 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
     on<LoadTeam>(loadTeam);
     on<DisplayTeam>(displayTeam);
     on<SearchFinish>(listUserLoaded);
+  }
+
+  void removeMemberFromTeam({required Team team, required User user}) {
+    // teamRepository.removeMemberFromTeam(currentTeam!.id, user.id);
+  }
+
+  List<User>? listTeamMember;
+  void loadTeamMember(Team team) async {
+    listTeamMember ??= await teamRepository.listTeamMember(team.roomId);
+    await Future.delayed(
+        const Duration(milliseconds: 100)); //delay for render UI
+    _teamMemberController.sink.add(listTeamMember!);
   }
 
   void _onSubChanged(event) async {
@@ -156,6 +171,7 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
     _searchStreamController.close();
     _debounceInvite?.cancel();
     _subChangedSub.cancel();
+    _teamMemberController.close();
     return super.close();
   }
 }

@@ -110,6 +110,22 @@ class TeamRepository {
       return false;
     }
   }
+
+  Future<List<User>> listTeamMember(String teamRoomId) async {
+    try {
+      final auth = StaticData.auth!;
+      final rawData = await _roomProvider.groupMembers(auth, null, teamRoomId);
+      var decodeData = jsonDecode(rawData);
+      if (decodeData['success'] == true) {
+        final users = usersFromMap(decodeData['members']);
+        return users;
+      }
+      return [];
+    } catch (e) {
+      debugPrint(e.toString());
+      return [];
+    }
+  }
 }
 
 enum CreateTeamStatus {

@@ -38,6 +38,10 @@ var kDarkTheme = ThemeData(
   colorScheme: const ColorScheme.dark(
     primary: _kPrimaryColor,
   ),
+  appBarTheme: const AppBarTheme(
+    color: _kBackgroundColor,
+    elevation: 0,
+  ),
 
   // inputDecorationTheme: kInputDecorationTheme,
   // textTheme: TextTheme()

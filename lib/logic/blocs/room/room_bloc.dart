@@ -33,7 +33,7 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
 
   Stream<List<User>> get teamMemberStream => _teamMemberController.stream;
   Stream<List<User>> get selectStream => _selectStreamController.stream;
-  Stream<List<User>> get searchStream => _roomMemberController.stream;
+  Stream<List<User>> get roomMemberStream => _roomMemberController.stream;
   RoomBloc({required this.teamBloc, required this.roomRepository})
       : super(RoomInitial()) {
     _messageStreamSub = teamBloc.messageStream.listen((event) {
@@ -98,10 +98,11 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
     // emit(RoomCreated(room: room));
   }
 
-  List<User>? listMember;
+  List<User>? listRoomMember;
   void listMemberInRoom(Room room) async {
-    listMember ??= await roomRepository.searchMember(room, '');
-    _roomMemberController.sink.add(listMember!);
+    listRoomMember ??= await roomRepository.searchMember(room, '');
+    await Future.delayed(const Duration(milliseconds: 100));
+    _roomMemberController.sink.add(listRoomMember!);
   }
 
   List<User> _listTeamMember = [];
@@ -123,8 +124,8 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
 
   Future<void> inviteUser({required Room room}) async {
     await roomRepository.addToRoom(room, _listSelected);
-    listMember = await roomRepository.searchMember(room, '');
-    _roomMemberController.sink.add(listMember!);
+    listRoomMember = await roomRepository.searchMember(room, '');
+    _roomMemberController.sink.add(listRoomMember!);
 
     clearSearchUser();
   }
@@ -146,18 +147,18 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   Future<bool> kickRoom(Room room, String userId) async {
     final ok = await roomRepository.kickRoom(room, userId);
     if (ok) {
-      for (User user in listMember ?? []) {
+      for (User user in listRoomMember ?? []) {
         if (user.id == userId) {
-          listMember!.remove(user);
+          listRoomMember!.remove(user);
           break;
         }
       }
 
-      _roomMemberController.sink.add(listMember!);
+      _roomMemberController.sink.add(listRoomMember!);
       return true;
     }
 
-    _roomMemberController.sink.add(listMember!);
+    _roomMemberController.sink.add(listRoomMember!);
     return false;
   }
 

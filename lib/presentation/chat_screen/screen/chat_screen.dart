@@ -19,7 +19,7 @@ class ChatScreen extends StatelessWidget {
       // required this.teamBloc,
       })
       : super(key: key) {
-    roomBloc.listMember = null;
+    roomBloc.listRoomMember = null;
   }
 
   @override
@@ -36,6 +36,7 @@ class ChatScreen extends StatelessWidget {
         body: _body(),
         endDrawer: Drawer(
           child: _Drawer(team: team, roomBloc: roomBloc, room: room),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         ),
       ),
     );
@@ -73,7 +74,7 @@ class _Drawer extends StatelessWidget {
       children: [
         Padding(
             padding: EdgeInsets.only(top: MediaQuery.of(context).padding.top)),
-        if (team.isOwner)
+        if (team.isOwner && team.roomId != room.id)
           ListTile(
             title: const Text(
               'Delete room',
@@ -109,7 +110,7 @@ class _Drawer extends StatelessWidget {
               );
             },
           ),
-        if (!(team.isOwner))
+        if (!(team.isOwner) && team.roomId != room.id)
           ListTile(
             title: const Text(
               'leave room',
@@ -145,7 +146,7 @@ class _Drawer extends StatelessWidget {
               );
             },
           ),
-        if (team.isOwner)
+        if (team.isOwner && team.roomId != room.id)
           ListTile(
             onTap: () {
               Navigator.push(context, MaterialPageRoute(builder: (_) {
@@ -169,7 +170,7 @@ class _Drawer extends StatelessWidget {
           child: ListRoomMember(
             room: room,
             roomBloc: roomBloc,
-            onLongPress: team.isOwner
+            onLongPress: (team.isOwner && team.roomId != room.id)
                 ? (user) async {
                     await showDialog(
                       context: context,
