@@ -5,8 +5,11 @@ import 'package:chat_app/data/data_providers/api/rocket_room_provider.dart';
 import 'package:chat_app/data/data_providers/api/rocket_team_provider.dart';
 import 'package:chat_app/data/data_providers/api/room_provider.dart';
 import 'package:chat_app/data/data_providers/api/team_provider.dart';
+import 'package:chat_app/data/data_providers/local_storage/room_localstorage.dart';
+import 'package:chat_app/data/data_providers/local_storage/room_sqlite.dart';
 import 'package:chat_app/data/data_providers/local_storage/team_localstorage.dart';
 import 'package:chat_app/data/data_providers/local_storage/team_sqlite.dart';
+import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/data/models/user.dart';
 import 'package:chat_app/utils/static_data.dart';
@@ -15,7 +18,99 @@ import 'package:flutter/widgets.dart';
 class TeamRepository {
   final TeamProvider _teamProvider = RocketTeamProvider();
   final RoomProvider _roomProvider = RocketRoomProvider();
+  final RoomLocalStorage _roomLocalStorage = RoomSqlite();
   final TeamLocalStorage _teamLocalStorage = TeamSqlite();
+
+  Future<bool> deleteTeam(Team team, List<Room> rooms) async {
+    try {
+      if (StaticData.internetStatus == InternetStatus.disconnected) {
+        return false;
+      } else {
+        final auth = StaticData.auth!;
+        final rawData = await _teamProvider.deleteTeam(auth, team, rooms);
+        final json = jsonDecode(rawData);
+        if (json['success'] == true) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    } catch (e, s) {
+      debugPrint(e.toString());
+      debugPrint(s.toString());
+      return false;
+    }
+  }
+
+  Future<bool> leaveTeam(Team team, List<Room> rooms) async {
+    try {
+      if (StaticData.internetStatus == InternetStatus.disconnected) {
+        return false;
+      } else {
+        final auth = StaticData.auth!;
+        final rawData = await _teamProvider.leaveTeam(auth, team, rooms);
+        final json = jsonDecode(rawData);
+        if (json['success'] == true) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    } catch (e, s) {
+      debugPrint(e.toString());
+      debugPrintStack(stackTrace: s);
+      return false;
+    }
+  }
+
+  Future<bool> removeMemberFromTeam(
+      User user, Team team, List<Room> rooms) async {
+    try {
+      if (StaticData.internetStatus == InternetStatus.disconnected) {
+        return false;
+      } else {
+        final auth = StaticData.auth;
+        final rawData =
+            await _teamProvider.removeMemberFromTeam(auth!, user, team, rooms);
+        final decodeData = jsonDecode(rawData);
+        if (decodeData['success'] == true) {
+          return true;
+        } else {
+          return false;
+        }
+      }
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
+    }
+  }
+
+  Future<List<Room>> listRooms(
+      {required String teamId, String? filter, String? type}) async {
+    try {
+      if (StaticData.internetStatus == InternetStatus.disconnected) {
+        final rooms = await _roomLocalStorage.listRooms(teamId);
+        return rooms;
+      } else {
+        final auth = StaticData.auth!;
+        final rawData = await _teamProvider.listRooms(
+          auth,
+          teamId,
+          filter,
+          type,
+        );
+        var decodeData = jsonDecode(rawData);
+        final rooms = roomsFromMap(decodeData['rooms']);
+        _roomLocalStorage.saveListRooms(rooms, teamId);
+        return rooms;
+      }
+    } catch (e, s) {
+      debugPrint(e.toString());
+      debugPrint(s.toString());
+      final rooms = await _roomLocalStorage.listRooms(teamId);
+      return rooms;
+    }
+  }
 
   Future<List<User>> listMember(String teamId) async {
     try {

@@ -9,7 +9,6 @@ import 'package:chat_app/utils/static_data.dart';
 import 'package:http/http.dart' as http;
 
 class RocketRoomProvider extends RocketServer implements RoomProvider {
-  final _listRoomRoute = '/api/v1/teams.listRooms';
   final _roomInfoRoute = '/api/v1/rooms.info';
   final _createGroupRoute = '/api/v1/groups.create';
   final _createChannelRoute = '/api/v1/channels.create';
@@ -21,37 +20,6 @@ class RocketRoomProvider extends RocketServer implements RoomProvider {
   final _leaveRoomRoute = '/api/v1/method.call/leaveRoom';
   final _kickGroupRoute = '/api/v1/groups.kick';
   final _kickChannelRoute = '/api/v1/channels.kick';
-
-  @override
-  Future<String> listRooms(
-      Auth auth, String teamId, String? filter, String? type) async {
-    String uri = '$serverAddr$_listRoomRoute?teamId=$teamId';
-    if (filter != null) {
-      uri += '&filter=$filter';
-    }
-    if (type != null) {
-      uri += '&type=$type';
-    }
-    try {
-      var response = await http.get(
-        Uri.parse(uri),
-        headers: {
-          'X-Auth-Token': auth.token,
-          'X-User-Id': auth.userId,
-        },
-      );
-      if (response.statusCode == 200) {
-        return response.body;
-      } else {
-        throw ServerException(
-          statusCode: response.statusCode,
-          message: response.body,
-        );
-      }
-    } catch (e) {
-      rethrow;
-    }
-  }
 
   @override
   getRoomInfo(Auth auth, String roomId) async {

@@ -1,6 +1,7 @@
 import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/logic/blocs/room/room_bloc.dart';
+import 'package:chat_app/logic/blocs/team/team_bloc.dart';
 import 'package:chat_app/presentation/chat_screen/screen/chat_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -20,15 +21,9 @@ class ListRoom extends StatefulWidget {
 
 class _ListRoomState extends State<ListRoom> {
   @override
-  void initState() {
-    super.initState();
-    BlocProvider.of<RoomBloc>(context)
-        .add(LoadRooms(teamId: widget.team.id, teamRoomId: widget.team.roomId));
-  }
-
-  @override
   Widget build(BuildContext context) {
-    return BlocConsumer<RoomBloc, RoomState>(
+    BlocProvider.of<TeamBloc>(context).loadRooms(team: widget.team);
+    return BlocListener<RoomBloc, RoomState>(
       listener: (context, state) {
         if (state is RoomSelected) {
           Navigator.of(context).push(MaterialPageRoute(
@@ -41,22 +36,28 @@ class _ListRoomState extends State<ListRoom> {
           ));
         }
       },
-      buildWhen: (previous, current) => current is RoomLoaded,
-      builder: (context, state) {
-        if (state is RoomLoaded) {
-          final publicRooms = state.publicRooms;
-          final privateRooms = state.privateRooms;
-          return ListView(
-            padding: EdgeInsets.zero,
-            children: [
-              _generalRoom(context, state.generalRoom),
-              _groupRoom('public rooms', rooms: publicRooms),
-              _groupRoom('private rooms', rooms: privateRooms),
-            ],
+      child: StreamBuilder<ListRoomTeam>(
+        stream: BlocProvider.of<TeamBloc>(context).listRoomStream,
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            final publicRooms = snapshot.data!.publicRooms;
+            final privateRooms = snapshot.data!.privateRooms;
+            return ListView(
+              padding: EdgeInsets.zero,
+              children: [
+                _generalRoom(context, snapshot.data!.generalRoom),
+                _groupRoom('public rooms', rooms: publicRooms),
+                _groupRoom('private rooms', rooms: privateRooms),
+              ],
+            );
+          } else if (snapshot.hasError) {
+            return Text(snapshot.error.toString());
+          }
+          return const Center(
+            child: CircularProgressIndicator(),
           );
-        }
-        return const SizedBox();
-      },
+        },
+      ),
     );
   }
 

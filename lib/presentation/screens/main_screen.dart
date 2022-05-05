@@ -45,6 +45,7 @@ class MainScreen extends StatelessWidget {
               create: (context) => TeamBloc(
                 teamRepository: RepositoryProvider.of<TeamRepository>(context),
                 userRepository: RepositoryProvider.of<UserRepository>(context),
+                roomRepository: RepositoryProvider.of<RoomRepository>(context),
               )..add(LoadTeam()),
             ),
           ],

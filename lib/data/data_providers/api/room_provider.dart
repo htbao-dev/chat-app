@@ -2,9 +2,6 @@ import 'package:chat_app/data/models/auth.dart';
 import 'package:chat_app/data/models/user.dart';
 
 abstract class RoomProvider {
-  Future<String> listRooms(
-      Auth auth, String teamId, String? filter, String? type);
-
   Future<String> getRoomInfo(Auth auth, String roomId);
 
   ///private "room"

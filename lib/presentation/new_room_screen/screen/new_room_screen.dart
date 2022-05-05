@@ -69,9 +69,6 @@ class _NewRoomScreenState extends State<NewRoomScreen> {
                           name: _textEditingController.text,
                           isPrivate: _switchValue);
                       if (status == CreateRoomStatus.success) {
-                        widget.roomBloc.add(LoadRooms(
-                            teamRoomId: widget.team.roomId,
-                            teamId: widget.team.id));
                         Navigator.pop(context);
                       } else if (status == CreateRoomStatus.duplicateName) {
                         setState(() {

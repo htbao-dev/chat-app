@@ -69,7 +69,7 @@ class _ListTeam extends StatelessWidget {
             (current is TeamHaveMessage && current.teamId == team.id),
         builder: (context, state) {
           final Color color;
-          if (state is TeamDisplayed && state.team!.id == team.id) {
+          if (state is TeamDisplayed && state.team?.id == team.id) {
             color = Theme.of(context).primaryColor;
           } else if (state is TeamHaveMessage) {
             color = Colors.red;

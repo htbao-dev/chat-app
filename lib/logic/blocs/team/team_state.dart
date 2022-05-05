@@ -43,3 +43,17 @@ class ListUserLoaded extends TeamState {
   @override
   List<Object> get props => [users];
 }
+
+class ListRoomTeam extends RoomState {
+  final Room generalRoom;
+  final List<Room> publicRooms;
+  final List<Room> privateRooms;
+  final String teamId;
+  ListRoomTeam(
+      {required this.publicRooms,
+      required this.teamId,
+      required this.privateRooms,
+      required this.generalRoom});
+  @override
+  List<Object> get props => [publicRooms, privateRooms, teamId];
+}

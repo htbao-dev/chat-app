@@ -40,7 +40,6 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
       emit(RoomReceiveMessage(message: event));
       // _messageController.sink.add(event);
     });
-    on<LoadRooms>(loadRooms);
     on<SelectRoom>(selectRoom);
   }
 
@@ -56,33 +55,6 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   Future<void> selectRoom(SelectRoom event, emit) async {
     StaticData.roomIdForcus = event.room.id;
     emit(RoomSelected(room: event.room));
-  }
-
-  Future<void> loadRooms(event, emit) async {
-    final List<Room> publicRooms = [];
-    final List<Room> privateRooms = [];
-    final Room generalRoom;
-
-    generalRoom = await roomRepository.getGeneralRoom(event.teamRoomId);
-
-    final rooms = await roomRepository.listRooms(
-      teamId: event.teamId,
-      filter: event.filter,
-      type: event.type,
-    );
-    for (var room in rooms) {
-      if (room.type == RoomTypes.publicRoom) {
-        publicRooms.add(room);
-      } else if (room.type == RoomTypes.privateRoom) {
-        privateRooms.add(room);
-      }
-    }
-    emit(RoomLoaded(
-      publicRooms: publicRooms,
-      privateRooms: privateRooms,
-      generalRoom: generalRoom,
-      teamId: event.teamId,
-    ));
   }
 
   Future<CreateRoomStatus> createRoom(

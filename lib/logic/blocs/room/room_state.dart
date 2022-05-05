@@ -8,20 +8,6 @@ class RoomInitial extends RoomState {
   List<Object> get props => [];
 }
 
-class RoomLoaded extends RoomState {
-  final Room generalRoom;
-  final List<Room> publicRooms;
-  final List<Room> privateRooms;
-  final String teamId;
-  RoomLoaded(
-      {required this.publicRooms,
-      required this.teamId,
-      required this.privateRooms,
-      required this.generalRoom});
-  @override
-  List<Object> get props => [publicRooms, privateRooms, teamId];
-}
-
 class RoomSelected extends RoomState {
   final Room room;
   RoomSelected({required this.room});

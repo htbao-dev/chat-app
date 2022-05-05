@@ -1,12 +1,16 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:chat_app/constants/values.dart';
 import 'package:chat_app/data/data_providers/websocket/team_socket.dart';
 import 'package:chat_app/data/models/message.dart';
+import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/data/models/user.dart';
+import 'package:chat_app/data/repositories/room_repository.dart';
 import 'package:chat_app/data/repositories/team_repository.dart';
 import 'package:chat_app/data/repositories/user_repository.dart';
+import 'package:chat_app/logic/blocs/room/room_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 
@@ -16,6 +20,7 @@ part 'team_state.dart';
 class TeamBloc extends Bloc<TeamEvent, TeamState> {
   final TeamRepository teamRepository;
   final UserRepository userRepository;
+  final RoomRepository roomRepository;
   final TeamSocket socket = TeamSocket();
 
   final StreamController<Message> _messageStreamController =
@@ -26,6 +31,10 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
       StreamController<List<User>>.broadcast();
   final StreamController<List<User>> _teamMemberController =
       StreamController<List<User>>.broadcast();
+  final StreamController<ListRoomTeam> _listRoomController =
+      StreamController<ListRoomTeam>.broadcast();
+
+  Stream<ListRoomTeam> get listRoomStream => _listRoomController.stream;
 
   late final Stream<List<User>> teamMemberStream;
   late final Stream<List<User>> selectStream;
@@ -37,8 +46,11 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
   List<Team>? listTeams;
   Team? currentTeam;
 
-  TeamBloc({required this.teamRepository, required this.userRepository})
-      : super(TeamInitial()) {
+  TeamBloc({
+    required this.teamRepository,
+    required this.userRepository,
+    required this.roomRepository,
+  }) : super(TeamInitial()) {
     messageStream = _messageStreamController.stream.asBroadcastStream();
     selectStream = _selectStreamController.stream;
     searchStream = _searchStreamController.stream;
@@ -61,8 +73,76 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
     on<SearchFinish>(listUserLoaded);
   }
 
-  void removeMemberFromTeam({required Team team, required User user}) {
-    // teamRepository.removeMemberFromTeam(currentTeam!.id, user.id);
+  ListRoomTeam? listRoomTeam;
+  Future<void> loadRooms(
+      {required Team team, String? filter, String? type}) async {
+    final List<Room> publicRooms = [];
+    final List<Room> privateRooms = [];
+    final Room generalRoom;
+
+    generalRoom = await roomRepository.getGeneralRoom(team.roomId);
+
+    final rooms = await teamRepository.listRooms(
+      teamId: team.id,
+      filter: filter,
+      type: type,
+    );
+    for (var room in rooms) {
+      if (room.type == RoomTypes.publicRoom) {
+        publicRooms.add(room);
+      } else if (room.type == RoomTypes.privateRoom) {
+        privateRooms.add(room);
+      }
+    }
+    listRoomTeam = ListRoomTeam(
+      publicRooms: publicRooms,
+      privateRooms: privateRooms,
+      generalRoom: generalRoom,
+      teamId: team.id,
+    );
+    _listRoomController.sink.add(listRoomTeam!);
+  }
+
+  Future<bool> deleteTeam(Team team) async {
+    List<Room> _rooms = [
+      ...listRoomTeam!.publicRooms,
+      ...listRoomTeam!.privateRooms,
+    ];
+    final ok = await teamRepository.deleteTeam(team, _rooms);
+    if (ok) {
+      listTeams = await teamRepository.listTeams();
+      emit(TeamLoaded(teams: listTeams!));
+    }
+    return ok;
+  }
+
+  Future<bool> leaveTeam(Team team) async {
+    List<Room> _rooms = [
+      ...listRoomTeam!.publicRooms,
+      ...listRoomTeam!.privateRooms,
+    ];
+    return await teamRepository.leaveTeam(team, _rooms);
+  }
+
+  Future<bool> removeMemberFromTeam({
+    required Team team,
+    required User user,
+  }) async {
+    List<Room> _rooms = [
+      ...listRoomTeam!.publicRooms,
+      ...listRoomTeam!.privateRooms,
+    ];
+    final ok = await teamRepository.removeMemberFromTeam(user, team, _rooms);
+    if (ok) {
+      for (final member in listTeamMember ?? []) {
+        if (member.id == user.id) {
+          listTeamMember!.remove(member);
+          break;
+        }
+      }
+      _teamMemberController.sink.add(listTeamMember!);
+    }
+    return ok;
   }
 
   List<User>? listTeamMember;
@@ -157,10 +237,12 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
     _selectStreamController.sink.add(_listSelected);
   }
 
-  Future<void> inviteUser({required String teamRoomId}) async {
+  Future<void> inviteUser({required Team team}) async {
     await teamRepository.inviteUsers(
-        teamRoomId: teamRoomId, users: _listSelected);
+        teamRoomId: team.roomId, users: _listSelected);
     clearSearchUser();
+    listTeamMember = await teamRepository.listTeamMember(team.roomId);
+    _teamMemberController.sink.add(listTeamMember!);
   }
 
   @override
@@ -171,6 +253,7 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
     _searchStreamController.close();
     _debounceInvite?.cancel();
     _subChangedSub.cancel();
+    _listRoomController.close();
     _teamMemberController.close();
     return super.close();
   }

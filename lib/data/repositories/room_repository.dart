@@ -17,33 +17,6 @@ class RoomRepository {
   final TeamProvider _teamProvider = RocketTeamProvider();
   final RoomLocalStorage _roomLocalStorage = RoomSqlite();
 
-  Future<List<Room>> listRooms(
-      {required String teamId, String? filter, String? type}) async {
-    try {
-      if (StaticData.internetStatus == InternetStatus.disconnected) {
-        final rooms = await _roomLocalStorage.listRooms(teamId);
-        return rooms;
-      } else {
-        final auth = StaticData.auth!;
-        final rawData = await _roomProvider.listRooms(
-          auth,
-          teamId,
-          filter,
-          type,
-        );
-        var decodeData = jsonDecode(rawData);
-        final rooms = roomsFromMap(decodeData['rooms']);
-        _roomLocalStorage.saveListRooms(rooms, teamId);
-        return rooms;
-      }
-    } catch (e, s) {
-      debugPrint(e.toString());
-      debugPrint(s.toString());
-      final rooms = await _roomLocalStorage.listRooms(teamId);
-      return rooms;
-    }
-  }
-
   Future<Room> getGeneralRoom(String teamRoomId) async {
     try {
       if (StaticData.internetStatus == InternetStatus.disconnected) {

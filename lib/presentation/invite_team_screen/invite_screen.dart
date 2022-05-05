@@ -1,3 +1,4 @@
+import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/data/models/user.dart';
 import 'package:chat_app/logic/blocs/team/team_bloc.dart';
 import 'package:chat_app/utils/theme.dart';
@@ -5,9 +6,8 @@ import 'package:flutter/material.dart';
 
 class InviteScreen extends StatefulWidget {
   final TeamBloc teamBloc;
-  final String teamRoomId;
-  const InviteScreen(
-      {Key? key, required this.teamBloc, required this.teamRoomId})
+  final Team team;
+  const InviteScreen({Key? key, required this.teamBloc, required this.team})
       : super(key: key);
 
   @override
@@ -16,6 +16,13 @@ class InviteScreen extends StatefulWidget {
 
 class _InviteScreenState extends State<InviteScreen> {
   // final List<User> listInvite = [];
+
+  @override
+  void initState() {
+    super.initState();
+
+    widget.teamBloc.searchInvite(selector: '');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +40,7 @@ class _InviteScreenState extends State<InviteScreen> {
                 return IconButton(
                   icon: const Icon(Icons.check),
                   onPressed: () {
-                    widget.teamBloc.inviteUser(teamRoomId: widget.teamRoomId);
+                    widget.teamBloc.inviteUser(team: widget.team);
                     Navigator.pop(context);
                   },
                 );

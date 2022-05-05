@@ -8,7 +8,6 @@ import 'package:chat_app/presentation/home_screen/widget/list_room_widget.dart';
 import 'package:chat_app/presentation/new_room_screen/screen/new_room_screen.dart';
 import 'package:chat_app/presentation/widgets/list_team_member.dart';
 import 'package:chat_app/utils/static_data.dart';
-import 'package:chat_app/utils/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -68,6 +67,40 @@ class _Drawer extends StatelessWidget {
           if (team.isOwner)
             ListTile(
               title: const Text(
+                'Delete team',
+                style: TextStyle(fontSize: 16, color: Colors.red),
+              ),
+              trailing: const Icon(
+                Icons.delete,
+                color: Colors.red,
+              ),
+              onTap: () async {
+                await showDialog(
+                  context: context,
+                  builder: (context1) => AlertDialog(
+                    title: Text('Delete ${team.name} ?'),
+                    content: const Text('Are you sure?'),
+                    actions: [
+                      TextButton(
+                        child: const Text('No'),
+                        onPressed: () => Navigator.of(context1).pop(),
+                      ),
+                      TextButton(
+                        child: const Text('Yes'),
+                        onPressed: () async {
+                          await BlocProvider.of<TeamBloc>(context)
+                              .deleteTeam(team);
+                          Navigator.of(context1).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          if (team.isOwner)
+            ListTile(
+              title: const Text(
                 'New room',
                 style: TextStyle(fontSize: 16),
               ),
@@ -86,6 +119,40 @@ class _Drawer extends StatelessWidget {
                     });
               },
             ),
+          if (!team.isOwner)
+            ListTile(
+              title: const Text(
+                'Leave team',
+                style: TextStyle(fontSize: 16, color: Colors.red),
+              ),
+              trailing: const Icon(
+                Icons.exit_to_app,
+                color: Colors.red,
+              ),
+              onTap: () async {
+                await showDialog(
+                  context: context,
+                  builder: (context1) => AlertDialog(
+                    title: const Text('Leave team'),
+                    content: const Text('Are you sure?'),
+                    actions: [
+                      TextButton(
+                        child: const Text('No'),
+                        onPressed: () => Navigator.of(context1).pop(),
+                      ),
+                      TextButton(
+                        child: const Text('Yes'),
+                        onPressed: () async {
+                          await BlocProvider.of<TeamBloc>(context)
+                              .leaveTeam(team);
+                          Navigator.of(context1).pop();
+                        },
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
           const Divider(
             thickness: 2,
           ),
@@ -95,6 +162,37 @@ class _Drawer extends StatelessWidget {
             onLongPressed: team.isOwner
                 ? (user) {
                     log(user.name!);
+                    showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (_) {
+                          return AlertDialog(
+                            contentPadding: const EdgeInsets.all(20),
+                            content: Text(
+                              'Are you sure you want to remove ${user.name} from team?',
+                              style: const TextStyle(fontSize: 16),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  await BlocProvider.of<TeamBloc>(context)
+                                      .removeMemberFromTeam(
+                                    team: team,
+                                    user: user,
+                                  );
+                                  Navigator.pop(context);
+                                },
+                                child: const Text('Remove'),
+                              ),
+                            ],
+                          );
+                        });
                   }
                 : null,
             teamBloc: BlocProvider.of<TeamBloc>(context),
@@ -128,7 +226,7 @@ class _Intro extends StatelessWidget {
                     Navigator.pushNamed(context, AppRoutes.inviteTeam,
                         arguments: {
                           'teamBloc': BlocProvider.of<TeamBloc>(context),
-                          'teamRoomId': team.roomId,
+                          'team': team,
                         });
                   },
                   child: Text(StaticData.languageDisplay.kInvite)),

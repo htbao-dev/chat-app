@@ -1,3 +1,4 @@
+import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/logic/blocs/team/team_bloc.dart';
 import 'package:chat_app/presentation/invite_team_screen/invite_screen.dart';
 import 'package:chat_app/presentation/screens/main_screen.dart';
@@ -48,7 +49,7 @@ Route? generateAppRoute(RouteSettings settings) {
       return MaterialPageRoute(
         builder: (context) => InviteScreen(
           teamBloc: args['teamBloc'] as TeamBloc,
-          teamRoomId: args['teamRoomId'] as String,
+          team: args['team'] as Team,
         ),
       );
     default:
