@@ -20,7 +20,8 @@ class AuthRepository {
       String rawData =
           await _authProvider.loginWithUsernameAndPassword(username, password);
       Map<String, dynamic> decodeData = jsonDecode(rawData);
-      // Map<String, dynamic> json = decodeData['data']['me'];
+      User user = User.fromMap(decodeData['data']['me']);
+      StaticData.user = user;
       Auth auth = Auth(
           token: decodeData['data']['authToken'],
           userId: decodeData['data']['userId']);
@@ -36,6 +37,7 @@ class AuthRepository {
     try {
       String rawData = await _authProvider.registerWithUsernameAndPassword(
           username, name, email, password);
+      print(rawData);
       Map<String, dynamic> decodeData = jsonDecode(rawData);
       return User.fromMap(decodeData['user']);
     } on ServerException catch (e) {
@@ -58,6 +60,8 @@ class AuthRepository {
       try {
         final rawData = await _authProvider.checkAuth(_auth.token);
         Map<String, dynamic> decodeData = jsonDecode(rawData);
+        User user = User.fromMap(decodeData['data']['me']);
+        StaticData.user = user;
         Auth auth = Auth(
             token: decodeData['data']['authToken'],
             userId: decodeData['data']['userId']);

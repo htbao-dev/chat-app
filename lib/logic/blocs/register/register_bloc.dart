@@ -41,8 +41,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
           emit(RegisterError(status: RegisterStatus.registerFailed));
         }
       } catch (e, s) {
-        // ignore: avoid_print
-        print(s);
+        print('$e\n$s');
       }
     });
   }

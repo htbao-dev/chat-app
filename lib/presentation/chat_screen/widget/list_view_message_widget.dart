@@ -24,7 +24,6 @@ class _ListViewMessageState extends State<ListViewMessage> {
     _controller.addListener(() {
       if (_controller.position.maxScrollExtent == _controller.position.pixels) {
         if (_canLoad) {
-          print('load more');
           final time = listMessage.last.timestamp;
           BlocProvider.of<ChatBloc>(context)
               .add(LoadHistory(roomId: widget.room.id, from: time));

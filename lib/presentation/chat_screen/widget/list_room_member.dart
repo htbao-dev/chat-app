@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/user.dart';
 import 'package:chat_app/logic/blocs/room/room_bloc.dart';

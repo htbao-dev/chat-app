@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:bloc/bloc.dart';
-import 'package:chat_app/constants/values.dart';
 import 'package:chat_app/data/models/message.dart';
 import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/user.dart';

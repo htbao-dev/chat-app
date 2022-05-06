@@ -37,7 +37,10 @@ class RegisterScreen extends StatelessWidget {
                         height: 50,
                       ),
                     ));
-          } else if (state is RegisterSuccess || state is RegisterError) {
+          } else if (state is RegisterSuccess) {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          } else if (state is RegisterError) {
             Navigator.of(context).pop();
           }
         },

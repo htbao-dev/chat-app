@@ -59,7 +59,8 @@ class User {
       roles: (rolesFromMap(json['roles'])),
       settings:
           json['settings'] != null ? Settings.fromMap(json['settings']) : null,
-      avatarUrl: json['avatarUrl'],
+      avatarUrl:
+          json['avatarUrl'] != null ? json['avatarUrl'] + '?format=png' : null,
     );
   }
 

@@ -30,8 +30,6 @@ class _LoginScreenState extends State<LoginScreen>
       duration: const Duration(milliseconds: 2000),
     );
     controller.forward();
-    _usernameController.text = '18T1021011';
-    _passwordController.text = '18T1021011';
   }
 
   @override

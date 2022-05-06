@@ -2,7 +2,6 @@ import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/logic/blocs/chat/chat_bloc.dart';
 import 'package:chat_app/logic/blocs/room/room_bloc.dart';
-import 'package:chat_app/logic/blocs/team/team_bloc.dart';
 import 'package:chat_app/presentation/chat_screen/screen/member_screen.dart';
 import 'package:chat_app/presentation/chat_screen/widget/chat_field_widget.dart';
 import 'package:chat_app/presentation/chat_screen/widget/list_room_member.dart';

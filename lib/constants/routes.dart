@@ -39,11 +39,11 @@ Route? generateAppRoute(RouteSettings settings) {
       );
     case AppRoutes.home:
       return MaterialPageRoute(
-        builder: (context) => MainScreen(),
+        builder: (context) => const MainScreen(),
       );
     case HomeRoutes.home:
       return MaterialPageRoute(
-        builder: (context) => MainScreen(),
+        builder: (context) => const MainScreen(),
       );
     case HomeRoutes.profile:
       return MaterialPageRoute(builder: (context) => const ProfileScreen());
