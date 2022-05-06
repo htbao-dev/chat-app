@@ -23,7 +23,7 @@ class RocketMessageProvider extends RocketServer implements MessageProvider {
     from ??= DateTime.now();
     try {
       String messageBody = '{"msg":"method","method":"loadHistory","params":'
-          '["$roomId",null,$quantity,{"\$date":${from.millisecondsSinceEpoch}},false]}';
+          '["$roomId",{"\$date": ${from.millisecondsSinceEpoch}},$quantity,{"\$date":${from.millisecondsSinceEpoch}},false]}';
       final response = await http.post(Uri.parse('$serverAddr$_loadHistoryUrl'),
           headers: {
             keyHeaderToken: auth.token,

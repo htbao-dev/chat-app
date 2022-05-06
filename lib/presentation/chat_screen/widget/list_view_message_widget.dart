@@ -1,13 +1,44 @@
 import 'package:chat_app/data/data_providers/api/rocket_server.dart';
 import 'package:chat_app/data/models/message.dart';
+import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/logic/blocs/chat/chat_bloc.dart';
 import 'package:chat_app/utils/static_data.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class ListViewMessage extends StatelessWidget {
-  ListViewMessage({Key? key}) : super(key: key);
+class ListViewMessage extends StatefulWidget {
+  final Room room;
+  const ListViewMessage({Key? key, required this.room}) : super(key: key);
+
+  @override
+  State<ListViewMessage> createState() => _ListViewMessageState();
+}
+
+class _ListViewMessageState extends State<ListViewMessage> {
+  final ScrollController _controller = ScrollController();
+  bool _canLoad = true;
   final List<Message> listMessage = [];
+
+  @override
+  void initState() {
+    _controller.addListener(() {
+      if (_controller.position.maxScrollExtent == _controller.position.pixels) {
+        if (_canLoad) {
+          print('load more');
+          final time = listMessage.last.timestamp;
+          BlocProvider.of<ChatBloc>(context)
+              .add(LoadHistory(roomId: widget.room.id, from: time));
+        }
+      }
+    });
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -16,12 +47,18 @@ class ListViewMessage extends StatelessWidget {
           current is HistoryLoaded || current is MessageReceive,
       builder: (context, state) {
         if (state is HistoryLoaded) {
-          listMessage.addAll(state.listMessage);
+          if (state.listMessage.isEmpty) {
+            _canLoad = false;
+          } else {
+            _canLoad = true;
+            listMessage.addAll(state.listMessage);
+          }
         } else if (state is MessageReceive) {
           listMessage.insert(0, state.message);
         }
         return ListView.builder(
           addAutomaticKeepAlives: true,
+          controller: _controller,
           reverse: true,
           padding: EdgeInsets.zero,
           itemCount: listMessage.length,

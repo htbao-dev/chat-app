@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class ProfileScreen extends StatelessWidget {
+  static const String routeName = '/home/profile';
   const ProfileScreen({Key? key}) : super(key: key);
 
   @override

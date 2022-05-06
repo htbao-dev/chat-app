@@ -52,7 +52,13 @@ class ChatScreen extends StatelessWidget {
 
   Widget _body() {
     return Column(
-      children: [Expanded(child: ListViewMessage()), ChatField()],
+      children: [
+        Expanded(
+            child: ListViewMessage(
+          room: room,
+        )),
+        ChatField()
+      ],
     );
   }
 }

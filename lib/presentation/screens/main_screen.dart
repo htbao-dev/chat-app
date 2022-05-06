@@ -6,14 +6,11 @@ import 'package:chat_app/logic/blocs/auth/auth_bloc.dart';
 import 'package:chat_app/logic/blocs/team/team_bloc.dart';
 import 'package:chat_app/logic/cubits/cubit/nav_cubit.dart';
 import 'package:chat_app/presentation/home_screen/screen/home_screen.dart';
-import 'package:chat_app/presentation/screens/profile_screen.dart';
-import 'package:chat_app/presentation/widgets/home_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class MainScreen extends StatelessWidget {
-  MainScreen({Key? key}) : super(key: key);
-  final Map<String, Widget> _screen = {};
+  const MainScreen({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
@@ -49,20 +46,10 @@ class MainScreen extends StatelessWidget {
               )..add(LoadTeam()),
             ),
           ],
-          child: Scaffold(
-            resizeToAvoidBottomInset: false,
-            body: BlocBuilder<NavCubit, String>(builder: ((context, route) {
-              if (_screen[route] == null) {
-                if (route == HomeRoutes.home) {
-                  _screen[route] = const HomeScreen();
-                } else if (route == HomeRoutes.profile) {
-                  _screen[route] = const ProfileScreen();
-                }
-              }
-              return _screen[route]!;
-            })),
-            bottomNavigationBar: const BottomNavBar(),
-          ),
+          child:
+              const Scaffold(resizeToAvoidBottomInset: false, body: HomeScreen()
+                  // bottomNavigationBar: const BottomNavBar(),
+                  ),
         ),
       ),
     );

@@ -1,6 +1,7 @@
 import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/logic/blocs/team/team_bloc.dart';
 import 'package:chat_app/presentation/new_team_screen/screen/new_team_screen.dart';
+import 'package:chat_app/presentation/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,7 +14,16 @@ class MenuTeam extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       mainAxisAlignment: MainAxisAlignment.start,
       children: [
-        const _MenuItem(child: Icon(Icons.chat)),
+        _MenuItem(
+          child: Icon(
+            Icons.person,
+            size: 30,
+            color: Theme.of(context).primaryColor,
+          ),
+          ontap: () {
+            Navigator.of(context).pushNamed(ProfileScreen.routeName);
+          },
+        ),
         const _ListTeam(),
         Container(width: 40, height: 1, color: Theme.of(context).primaryColor),
         _MenuItem(
