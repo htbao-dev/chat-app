@@ -5,12 +5,12 @@ bool validateUsername(String? username) {
   if (username.length < 6) {
     return false;
   }
-  // if (username.startsWith(RegExp(r'[0-9]'))) {
-  //   return false;
-  // }
-  // if (username.contains(RegExp(r'[^a-zA-Z0-9\.]'))) {
-  //   return false;
-  // }
+  if (username.startsWith(RegExp(r'[0-9]'))) {
+    return false;
+  }
+  if (username.contains(RegExp(r'[^a-zA-Z0-9\.]'))) {
+    return false;
+  }
   return true;
 }
 

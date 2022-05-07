@@ -36,9 +36,6 @@ class MainScreen extends StatelessWidget {
         child: MultiBlocProvider(
           providers: [
             BlocProvider(
-              create: (context) => NavCubit(),
-            ),
-            BlocProvider(
               create: (context) => TeamBloc(
                 teamRepository: RepositoryProvider.of<TeamRepository>(context),
                 userRepository: RepositoryProvider.of<UserRepository>(context),

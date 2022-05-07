@@ -64,9 +64,11 @@ class RegisterScreen extends StatelessWidget {
                         controller: _passwordController,
                       ),
                       space,
-                      _nameField(_nameController),
+                      NameField(
+                        controller: _nameController,
+                      ),
                       space,
-                      _emailField(_emailController),
+                      EmailField(controller: _emailController),
                       const SizedBox(height: 10),
                       _nofityError(),
                       const SizedBox(height: 10),
@@ -81,38 +83,6 @@ class RegisterScreen extends StatelessWidget {
           ));
         }),
       ),
-    );
-  }
-
-  Widget _nameField(TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: StaticData.languageDisplay.kName,
-        prefixIcon: const Icon(Icons.person),
-      ),
-      validator: (value) {
-        if (!validateName(value)) {
-          return StaticData.languageDisplay.kInvalidName;
-        }
-        return null;
-      },
-    );
-  }
-
-  Widget _emailField(TextEditingController controller) {
-    return TextFormField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: StaticData.languageDisplay.kEmail,
-        prefixIcon: const Icon(Icons.person),
-      ),
-      validator: (value) {
-        if (!validateEmail(value)) {
-          return StaticData.languageDisplay.kInvalidEmail;
-        }
-        return null;
-      },
     );
   }
 

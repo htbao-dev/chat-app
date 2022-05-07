@@ -6,7 +6,9 @@ import 'package:chat_app/constants/exceptions.dart';
 import 'package:chat_app/constants/values.dart';
 import 'package:chat_app/data/data_providers/websocket/auth_socket.dart';
 import 'package:chat_app/data/models/auth.dart';
+import 'package:chat_app/data/models/user.dart';
 import 'package:chat_app/data/repositories/auth_repository.dart';
+import 'package:chat_app/data/repositories/user_repository.dart';
 import 'package:chat_app/logic/blocs/app/app_bloc.dart';
 import 'package:chat_app/logic/blocs/internet_bloc.dart';
 import 'package:chat_app/utils/static_data.dart';
@@ -18,9 +20,16 @@ part 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
   final AuthRepository authRepo;
+  final UserRepository userRepository = UserRepository();
   final InternetBloc network;
   final AppBloc appBloc;
   final AuthSocket _socketAuth = AuthSocket();
+
+  final StreamController<User?> _userController =
+      StreamController<User?>.broadcast();
+
+  Stream<User?> get userStream => _userController.stream;
+
   late final StreamSubscription _appBlocSubscription;
   AuthBloc(
       {required this.authRepo, required this.appBloc, required this.network})
@@ -45,6 +54,17 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<CheckAuth>((checkAuth));
     on<Logout>(logout);
   }
+
+  void getUserInfo() async {
+    final auth = StaticData.auth!;
+    final user = await userRepository.getUserInfo(auth: auth);
+    _userController.sink.add(user);
+  }
+
+  // Future<bool> updateUserInfo(
+  //     {String? name, String? email, String? password, String? username}) async {
+
+  //     }
 
   logout(event, emit) async {
     emit(AuthLoading());
@@ -105,6 +125,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   @override
   Future<void> close() {
+    _userController.close();
     _appBlocSubscription.cancel();
     return super.close();
   }
