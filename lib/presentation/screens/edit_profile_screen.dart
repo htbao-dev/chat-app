@@ -1,8 +1,10 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/data/models/user.dart';
+import 'package:chat_app/logic/blocs/auth/auth_bloc.dart';
 import 'package:chat_app/presentation/widgets/auth_wiget.dart';
 import 'package:chat_app/presentation/widgets/avt_profile.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final User user;
@@ -14,6 +16,7 @@ class EditProfileScreen extends StatefulWidget {
 
 class _EditProfileScreenState extends State<EditProfileScreen> {
   bool isEdit = false;
+  String? errMsg;
   final _formKey = GlobalKey<FormState>();
   final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -43,11 +46,35 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(top: 30),
-                  child:
-                      Center(child: AvatarProfile(widget.user.avatarUrl ?? '')),
+                  child: Center(
+                    child: AvatarProfile(widget.user.avatarUrl ?? ''),
+                  ),
+                ),
+                //button pick image
+                TextButton.icon(
+                  onPressed: () async {
+                    showDialog(
+                      context: context,
+                      builder: (context) => const Center(
+                        child: CircularProgressIndicator(),
+                      ),
+                    );
+                    final success =
+                        await BlocProvider.of<AuthBloc>(context).openGallery();
+                    if (success) {
+                      await CachedNetworkImage.evictFromCache(
+                          widget.user.avatarUrl!);
+                      setState(() {});
+
+                      await BlocProvider.of<AuthBloc>(context).getUserInfo();
+                    }
+                    Navigator.pop(context);
+                  },
+                  icon: const Icon(Icons.image),
+                  label: const Text('Pick image'),
                 ),
                 Container(
-                  margin: const EdgeInsets.symmetric(vertical: 20),
+                  margin: const EdgeInsets.symmetric(vertical: 10),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
                   color: Theme.of(context).backgroundColor,
@@ -72,6 +99,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                         },
                       ),
                       const SizedBox(height: 15),
+                      errMsg != null
+                          ? Text(
+                              errMsg!,
+                              style: const TextStyle(color: Colors.red),
+                            )
+                          : const SizedBox(),
                       _saveButton(context),
                     ],
                   ),
@@ -87,16 +120,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   Widget _saveButton(BuildContext context) {
     return ElevatedButton(
       child: const Text('save'),
-      onPressed: () {
+      onPressed: () async {
         if (_formKey.currentState!.validate()) {
-          // BlocProvider.of<RegisterBloc>(context).add(
-          //   RegisterSubmited(
-          //     username: _usernameController.text,
-          //     password: _passwordController.text,
-          //     name: _nameController.text,
-          //     email: _emailController.text,
-          //   ),
-          // );
+          showDialog(
+            context: context,
+            builder: (context) => const Center(
+              child: CircularProgressIndicator(),
+            ),
+          );
+          final success =
+              await BlocProvider.of<AuthBloc>(context).updateUserInfo(
+            name: _nameController.text,
+            email: _emailController.text,
+            username: _usernameController.text,
+          );
+          if (success) {
+            await BlocProvider.of<AuthBloc>(context).getUserInfo();
+            Navigator.pop(context);
+          } else {
+            setState(() {
+              errMsg = 'Update failed';
+            });
+          }
+          Navigator.pop(context);
         }
       },
     );

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/constants/enums.dart';
@@ -14,6 +15,7 @@ import 'package:chat_app/logic/blocs/internet_bloc.dart';
 import 'package:chat_app/utils/static_data.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
+import 'package:image_picker/image_picker.dart';
 
 part 'auth_event.dart';
 part 'auth_state.dart';
@@ -55,16 +57,36 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<Logout>(logout);
   }
 
-  void getUserInfo() async {
+  Future<void> getUserInfo() async {
     final auth = StaticData.auth!;
     final user = await userRepository.getUserInfo(auth: auth);
     _userController.sink.add(user);
   }
 
-  // Future<bool> updateUserInfo(
-  //     {String? name, String? email, String? password, String? username}) async {
+  Future<bool> updateUserInfo(
+      {String? name, String? email, String? password, String? username}) async {
+    final success = await userRepository.updateUserInfo(
+      name: name,
+      email: email,
+      password: password,
+      username: username,
+    );
+    return success;
+  }
 
-  //     }
+  Future<bool> openGallery() async {
+    try {
+      final ImagePicker _picker = ImagePicker();
+      final file = await _picker.pickImage(source: ImageSource.gallery);
+      //XFile to File
+      final image = File(file!.path);
+      final success = await userRepository.setAvatar(image);
+      return success;
+    } catch (e) {
+      debugPrint(e.toString());
+      return false;
+    }
+  }
 
   logout(event, emit) async {
     emit(AuthLoading());
@@ -75,7 +97,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(AuthLogout());
   }
 
-  checkAuth(event, emit) async {
+  Future<void> checkAuth(event, emit) async {
     try {
       final auth = await authRepo.checkAuth();
       _doWhenAuthSuccess(auth!);
@@ -119,8 +141,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   void _doWhenAuthSuccess(Auth auth) {
     StaticData.auth = auth;
-    _socketAuth.connect(auth);
-    _socketAuth.subcrNotifyUserMessage(auth);
+    if (StaticData.internetStatus == InternetStatus.connected) {
+      _socketAuth.connect(auth);
+      _socketAuth.subcrNotifyUserMessage(auth);
+    }
   }
 
   @override

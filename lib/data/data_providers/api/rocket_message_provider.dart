@@ -5,6 +5,7 @@ import 'package:chat_app/constants/exceptions.dart';
 import 'package:chat_app/data/data_providers/api/message_provider.dart';
 import 'package:chat_app/data/data_providers/api/rocket_server.dart';
 import 'package:chat_app/data/models/auth.dart';
+import 'package:chat_app/utils/formatter.dart';
 import 'package:chat_app/utils/static_data.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:http/http.dart' as http;
@@ -78,7 +79,7 @@ class RocketMessageProvider extends RocketServer implements MessageProvider {
   Future<String> sendFilesMessage(
     Auth auth, {
     required String roomId,
-    required String msg,
+    required String? msg,
     required File file,
   }) async {
     try {
@@ -94,10 +95,10 @@ class RocketMessageProvider extends RocketServer implements MessageProvider {
         'Content-Type': 'multipart/form-data',
       });
       request.fields.addAll({
-        'msg': msg,
+        if (msg != null) 'msg': msg,
       });
-      final subType = _getSubtype(file.path);
-      final type = _getType(subType);
+      final subType = getSubtype(file.path);
+      final type = getType(subType);
       final multipartFile = await http.MultipartFile.fromPath(
         'file',
         file.path,
@@ -118,28 +119,5 @@ class RocketMessageProvider extends RocketServer implements MessageProvider {
     } catch (_) {
       rethrow;
     }
-  }
-
-  String _getType(String subType) {
-    if (subType.contains('jpeg')) {
-      return 'image';
-    }
-    if (subType.contains('png')) {
-      return 'image';
-    }
-    if (subType.contains('gif')) {
-      return 'image';
-    }
-    if (subType.contains('mp4')) {
-      return 'video';
-    }
-    if (subType.contains('mp3')) {
-      return 'audio';
-    }
-    return 'file';
-  }
-
-  String _getSubtype(String path) {
-    return path.split('.').last;
   }
 }

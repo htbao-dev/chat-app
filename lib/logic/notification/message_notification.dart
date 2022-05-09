@@ -16,7 +16,7 @@ class MessageNotification {
       _notiApi.showNotification(
         title: title,
         body: text,
-        payload: 'event.payload', //TODO: edit payload
+        payload: 'event.payload',
       );
     }
   }

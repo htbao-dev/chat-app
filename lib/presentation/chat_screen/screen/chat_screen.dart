@@ -191,8 +191,6 @@ class _Drawer extends StatelessWidget {
                             onPressed: () async {
                               await roomBloc.kickRoom(room, user.id);
                               Navigator.of(context).pop();
-                              // roomBloc.add(
-                              //     LoadRooms(teamId: team.id, teamRoomId: team.roomId));
                             },
                           ),
                         ],

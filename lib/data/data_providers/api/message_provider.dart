@@ -10,5 +10,5 @@ abstract class MessageProvider {
       {required String roomId, required String msg});
 
   Future<String> sendFilesMessage(Auth auth,
-      {required String roomId, required String msg, required File file});
+      {required String roomId, required String? msg, required File file});
 }

@@ -37,7 +37,6 @@ class AuthRepository {
     try {
       String rawData = await _authProvider.registerWithUsernameAndPassword(
           username, name, email, password);
-      print(rawData);
       Map<String, dynamic> decodeData = jsonDecode(rawData);
       return User.fromMap(decodeData['user']);
     } on ServerException catch (e) {

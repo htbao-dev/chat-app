@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:chat_app/data/data_providers/api/rocket_user_provider.dart';
 import 'package:chat_app/data/data_providers/api/user_provider.dart';
@@ -10,19 +11,31 @@ import 'package:flutter/widgets.dart';
 class UserRepository {
   final UserProvider _userProvider = RocketUserProvider();
 
+  Future<bool> setAvatar(File image) async {
+    final auth = StaticData.auth!;
+    try {
+      final rawData = await _userProvider.setAvatar(auth: auth, image: image);
+      final json = jsonDecode(rawData);
+      return json['success'];
+    } catch (e, s) {
+      debugPrint(e.toString());
+      debugPrintStack(stackTrace: s);
+      return false;
+    }
+  }
+
   Future<User?> getUserInfo({required Auth auth}) async {
     try {
       final response = await _userProvider.getUserInfo(auth: auth);
       final user = User.fromMap(json.decode(response));
       return user;
     } catch (e, s) {
-      print(e);
-      print(s);
+      debugPrintStack(label: e.toString(), stackTrace: s);
       return null;
     }
   }
 
-  Future<User?> updateUserInfo(
+  Future<bool> updateUserInfo(
       {String? name, String? email, String? password, String? username}) async {
     try {
       final auth = StaticData.auth!;
@@ -33,12 +46,16 @@ class UserRepository {
         password: password,
         username: username,
       );
-      final user = User.fromMap(json.decode(response));
-      return user;
+      final decodeData = json.decode(response);
+      final data = jsonDecode(decodeData['message']);
+      final success =
+          (decodeData['success'] == true) && (data['error'] == null);
+
+      return success;
     } catch (e, s) {
-      print(e);
-      print(s);
-      return null;
+      debugPrintStack(label: e.toString(), stackTrace: s);
+
+      return false;
     }
   }
 

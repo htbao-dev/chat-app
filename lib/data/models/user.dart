@@ -1,3 +1,5 @@
+import 'package:chat_app/utils/strings.dart';
+
 const String tableUser = 'user';
 
 List<Email>? emailsFromMap(List<dynamic>? json) {
@@ -59,8 +61,9 @@ class User {
       roles: (rolesFromMap(json['roles'])),
       settings:
           json['settings'] != null ? Settings.fromMap(json['settings']) : null,
-      avatarUrl:
-          json['avatarUrl'] != null ? json['avatarUrl'] + '?format=png' : null,
+      avatarUrl: json['avatarUrl'] != null
+          ? json['avatarUrl'] + '?format=png'
+          : getAvatarUrl(param: json['username'], isRoomOrTeam: false),
     );
   }
 

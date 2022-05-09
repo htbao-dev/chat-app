@@ -4,7 +4,6 @@ import 'package:chat_app/logic/blocs/register/register_bloc.dart';
 import 'package:chat_app/presentation/widgets/auth_wiget.dart';
 import 'package:chat_app/utils/static_data.dart';
 import 'package:chat_app/utils/theme.dart';
-import 'package:chat_app/utils/validation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 

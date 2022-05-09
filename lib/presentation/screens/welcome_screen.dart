@@ -20,6 +20,7 @@ class _WelcomeScreenState extends State<WelcomeScreen>
   @override
   void initState() {
     super.initState();
+    BlocProvider.of<AuthBloc>(context).add(CheckAuth());
     controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 2000),

@@ -27,12 +27,17 @@ class Websocket extends RocketServer {
   Websocket._internal();
 
   void connectServer() {
-    _channel = WebSocketChannel.connect(Uri.parse(serverSocketAddr));
-    _stream =
-        _channel.stream.map((event) => json.decode(event)).asBroadcastStream();
-    _stream.listen((event) {
-      _mapEvent(event);
-    });
+    try {
+      _channel = WebSocketChannel.connect(Uri.parse(serverSocketAddr));
+      _stream = _channel.stream
+          .map((event) => json.decode(event))
+          .asBroadcastStream();
+      _stream.listen((event) {
+        _mapEvent(event);
+      });
+    } catch (e) {
+      print(e);
+    }
   }
 
   void close() {
@@ -57,7 +62,6 @@ class Websocket extends RocketServer {
             .contains('subscriptions-changed')) {
       _subChangedStreamController.sink.add(event);
     } else if (event['collection'] == 'stream-room-messages') {
-      print(event);
       _roomMessageStreamController.sink.add(event);
     }
   }

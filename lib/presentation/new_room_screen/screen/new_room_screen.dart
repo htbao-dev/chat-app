@@ -31,6 +31,7 @@ class _NewRoomScreenState extends State<NewRoomScreen> {
           TextFormField(
             decoration: const InputDecoration(
               labelText: 'Room name',
+              errorMaxLines: 2,
             ),
             controller: _textEditingController,
             validator: (value) {
@@ -64,10 +65,18 @@ class _NewRoomScreenState extends State<NewRoomScreen> {
               ElevatedButton(
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                      );
                       final status = await widget.roomBloc.createRoom(
                           teamId: widget.team.id,
                           name: _textEditingController.text,
                           isPrivate: _switchValue);
+                      Navigator.pop(context);
+
                       if (status == CreateRoomStatus.success) {
                         Navigator.pop(context);
                       } else if (status == CreateRoomStatus.duplicateName) {

@@ -1,9 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
-class AvatarProfile extends StatelessWidget {
+class AvatarChat extends StatelessWidget {
   final String avatarUrl;
-  const AvatarProfile(
+  const AvatarChat(
     this.avatarUrl, {
     Key? key,
   }) : super(key: key);
@@ -13,8 +13,8 @@ class AvatarProfile extends StatelessWidget {
     return CachedNetworkImage(
         imageUrl: avatarUrl,
         cacheKey: avatarUrl,
-        width: 150,
-        height: 150,
+        width: 50,
+        height: 50,
         imageBuilder: (context, imageProvider) => Container(
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
@@ -38,7 +38,7 @@ class ErrAvtProfile extends StatelessWidget {
       backgroundColor: Theme.of(context).backgroundColor,
       child: Icon(
         Icons.person,
-        size: 100,
+        size: 30,
         color: Theme.of(context).primaryColor,
       ),
     );

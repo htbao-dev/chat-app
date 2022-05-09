@@ -11,7 +11,6 @@ class StaticData {
   static int get idRandom => _idRandom++;
   static String? roomIdForcus;
   static User? user;
-
   static resetData() {
     internetStatus = InternetStatus.connected;
     languageDisplay = EnglishDisplay();

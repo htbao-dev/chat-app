@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/logic/blocs/team/team_bloc.dart';
 import 'package:chat_app/presentation/new_team_screen/screen/new_team_screen.dart';
@@ -97,25 +98,6 @@ class _ListTeam extends StatelessWidget {
       },
       child: Stack(children: [
         _MenuItem(imageUrl: getAvatarUrl(param: team.roomId)),
-        // child: BlocBuilder<TeamBloc, TeamState>(
-        //   buildWhen: (previous, current) =>
-        //       current is TeamDisplayed ||
-        //       (current is TeamHaveMessage && current.teamId == team.id),
-        //   builder: (context, state) {
-        //     final Color color;
-        //     if (state is TeamDisplayed && state.team?.id == team.id) {
-        //       color = Theme.of(context).primaryColor;
-        //     } else if (state is TeamHaveMessage) {
-        //       color = Colors.red;
-        //     } else {
-        //       color = Colors.grey;
-        //     }
-        //     return Icon(
-        //       Icons.chat,
-        //       color: color,
-        //     );
-        //   },
-        // ),
       ]),
     );
   }
@@ -132,20 +114,42 @@ class _MenuItem extends StatefulWidget {
 class _MenuItemState extends State<_MenuItem> {
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Container(
-        height: 50,
-        width: 50,
-        decoration: BoxDecoration(
-            color: Theme.of(context).backgroundColor,
-            image: widget.imageUrl != null
-                ? DecorationImage(
-                    image: NetworkImage(widget.imageUrl!), fit: BoxFit.cover)
-                : null,
-            shape: BoxShape.circle),
-        child: widget.child,
-      ),
+    if (widget.imageUrl != null) {
+      return CachedNetworkImage(
+          imageUrl: "widget.imageUrl!",
+          imageBuilder: (context, imageProvider) => Container(
+              margin: const EdgeInsets.all(8.0),
+              height: 50,
+              width: 50,
+              decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  image: DecorationImage(
+                    image: imageProvider,
+                    fit: BoxFit.cover,
+                  ))),
+          placeholder: (context, url) => _itemChild(Icon(
+                Icons.message,
+                size: 25,
+                color: Theme.of(context).primaryColor,
+              )),
+          errorWidget: (context, url, error) => _itemChild(Icon(
+                Icons.message,
+                size: 25,
+                color: Theme.of(context).primaryColor,
+              )));
+    } else {
+      return _itemChild(widget.child!);
+    }
+  }
+
+  Widget _itemChild(Widget child) {
+    return Container(
+      margin: const EdgeInsets.all(8.0),
+      height: 50,
+      width: 50,
+      decoration: BoxDecoration(
+          color: Theme.of(context).backgroundColor, shape: BoxShape.circle),
+      child: child,
     );
   }
 }

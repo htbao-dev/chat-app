@@ -16,11 +16,10 @@ class ChatApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final AuthRepository authRepo = AuthRepository();
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(
-          create: (context) => authRepo,
+          create: (context) => AuthRepository(),
         ),
         RepositoryProvider(
           create: (context) => InternetBloc(),
@@ -36,7 +35,7 @@ class ChatApp extends StatelessWidget {
           ),
           BlocProvider(
             create: (context) => AuthBloc(
-              authRepo: authRepo,
+              authRepo: RepositoryProvider.of<AuthRepository>(context),
               appBloc: BlocProvider.of<AppBloc>(context),
               network: RepositoryProvider.of<InternetBloc>(context),
             ),

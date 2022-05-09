@@ -39,7 +39,10 @@ class _DisplayProfileScreenState extends State<DisplayProfileScreen> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 30),
-            child: Center(child: AvatarProfile(widget.user.avatarUrl ?? '')),
+            child: Center(
+                child: AvatarProfile(
+              widget.user.avatarUrl ?? '',
+            )),
           ),
           Padding(
             padding: const EdgeInsets.symmetric(vertical: 15),

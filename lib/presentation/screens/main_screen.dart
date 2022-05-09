@@ -4,7 +4,6 @@ import 'package:chat_app/data/repositories/team_repository.dart';
 import 'package:chat_app/data/repositories/user_repository.dart';
 import 'package:chat_app/logic/blocs/auth/auth_bloc.dart';
 import 'package:chat_app/logic/blocs/team/team_bloc.dart';
-import 'package:chat_app/logic/cubits/cubit/nav_cubit.dart';
 import 'package:chat_app/presentation/home_screen/screen/home_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';

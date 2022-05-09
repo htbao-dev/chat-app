@@ -32,7 +32,7 @@ class Message {
 
   String id;
   String roomId;
-  String msg;
+  String? msg;
   DateTime? timestamp;
   User user;
   DateTime? updatedAt;

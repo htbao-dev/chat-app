@@ -3,7 +3,7 @@ import 'package:chat_app/constants/exceptions.dart';
 import 'package:chat_app/constants/values.dart';
 import 'package:chat_app/data/repositories/auth_repository.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
+import 'package:flutter/material.dart';
 
 part 'register_event.dart';
 part 'register_state.dart';
@@ -37,11 +37,10 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
         } else if (e.statusCode == RequestStatusCode.tooManyRequest) {
           emit(RegisterError(status: RegisterStatus.retry));
         } else {
-          //TODO: handle other error
           emit(RegisterError(status: RegisterStatus.registerFailed));
         }
       } catch (e, s) {
-        print('$e\n$s');
+        debugPrintStack(label: e.toString(), stackTrace: s);
       }
     });
   }

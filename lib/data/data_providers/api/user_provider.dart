@@ -1,5 +1,6 @@
+import 'dart:io';
+
 import 'package:chat_app/data/models/auth.dart';
-import 'package:chat_app/presentation/widgets/auth_wiget.dart';
 
 abstract class UserProvider {
   Future<String> getUsers({required Auth auth, required String selector});
@@ -11,4 +12,5 @@ abstract class UserProvider {
       String? email,
       String? password,
       String? username});
+  Future<String> setAvatar({required Auth auth, required File image});
 }
