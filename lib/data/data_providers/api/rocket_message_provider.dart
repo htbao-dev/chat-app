@@ -21,10 +21,9 @@ class RocketMessageProvider extends RocketServer implements MessageProvider {
   @override
   Future<String> loadHistory(Auth auth, String roomId,
       [DateTime? from, int quantity = 50]) async {
-    from ??= DateTime.now();
     try {
       String messageBody = '{"msg":"method","method":"loadHistory","params":'
-          '["$roomId",{"\$date": ${from.millisecondsSinceEpoch}},$quantity,{"\$date":${from.millisecondsSinceEpoch}},false]}';
+          '["$roomId",{"\$date": ${from!.millisecondsSinceEpoch}},$quantity,{"\$date":${from.millisecondsSinceEpoch}},false]}';
       final response = await http.post(Uri.parse('$serverAddr$_loadHistoryUrl'),
           headers: {
             keyHeaderToken: auth.token,

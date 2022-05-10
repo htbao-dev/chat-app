@@ -1,6 +1,7 @@
 import 'package:chat_app/data/data_providers/local_storage/room_localstorage.dart';
 import 'package:chat_app/data/data_providers/local_storage/sqlite_core.dart';
 import 'package:chat_app/data/models/room.dart';
+import 'package:chat_app/data/models/user.dart';
 import 'package:sqflite/sqflite.dart';
 
 class RoomSqlite implements RoomLocalStorage {
@@ -53,5 +54,17 @@ class RoomSqlite implements RoomLocalStorage {
         .query(tableRoom, where: '${RoomFields.id} = ?', whereArgs: [roomId]);
     final Room room = Room.fromJson(roomQuery.first);
     return room;
+  }
+
+  @override
+  Future saveListUserInRoom(List<User> users, String roomId) async {
+    var db = await _localDb.database;
+    var batch = db.batch();
+    for (var user in users) {
+      batch.insert(tableRoomUser,
+          {tableRoomUser_room: roomId, tableRoomUser_user: user.id},
+          conflictAlgorithm: ConflictAlgorithm.replace);
+    }
+    await batch.commit(noResult: true);
   }
 }

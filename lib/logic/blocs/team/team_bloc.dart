@@ -80,7 +80,7 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
     final List<Room> privateRooms = [];
     final Room generalRoom;
 
-    generalRoom = await roomRepository.getGeneralRoom(team.roomId);
+    generalRoom = await roomRepository.getGeneralRoom(team.roomId, team.id);
 
     final rooms = await teamRepository.listRooms(
       teamId: team.id,

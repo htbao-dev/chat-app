@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:chat_app/data/models/auth.dart';
+import 'package:chat_app/data/models/message.dart';
 import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/data/models/user.dart';
@@ -8,6 +9,11 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 const String databaseName = 'chat_app.db';
+const String tableRoomUser = tableRoom + '_' + tableUser;
+// ignore: constant_identifier_names
+const String tableRoomUser_room = 'roomId';
+// ignore: constant_identifier_names
+const String tableRoomUser_user = 'userId';
 
 class SqliteCore {
   static final SqliteCore _instance = SqliteCore._internal();
@@ -36,10 +42,8 @@ class SqliteCore {
         ${UserFields.id} TEXT PRIMARY KEY,
         ${UserFields.name} TEXT,
         ${UserFields.email} TEXT,
-        ${UserFields.password} TEXT,
-        ${UserFields.avatar} TEXT,
-        ${UserFields.createdAt} TEXT,
-        ${UserFields.updatedAt} TEXT
+        ${UserFields.username} TEXT,
+        ${UserFields.avatarUrl} TEXT
       )
     ''');
 
@@ -70,6 +74,26 @@ class SqliteCore {
         ${RoomFields.type} TEXT,
         ${RoomFields.description} TEXT,
         FORIEGN KEY ${RoomFields.teamId} REFERENCES $tableTeam(${TeamFields.id})
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE $tableMessage (
+        ${MessageFields.id} TEXT PRIMARY KEY,
+        ${MessageFields.roomId} TEXT NOT NULL REFERENCES $tableRoom(${RoomFields.id}),
+        ${MessageFields.userId} TEXT NOT NULL REFERENCES $tableUser(${UserFields.id}),
+        ${MessageFields.msg} TEXT,
+        ${MessageFields.type} TEXT,
+        ${MessageFields.attachments} TEXT,
+        ${MessageFields.timestamp} TEXT
+      )
+    ''');
+
+    await db.execute('''
+      CREATE TABLE $tableRoomUser (
+        $tableRoomUser_room TEXT NOT NULL REFERENCES $tableRoom(${RoomFields.id}),
+        $tableRoomUser_user TEXT NOT NULL REFERENCES $tableUser(${UserFields.id}),
+        PRIMARY KEY ($tableRoomUser_room, $tableRoomUser_user)
       )
     ''');
   }

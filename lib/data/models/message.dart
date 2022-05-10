@@ -1,8 +1,23 @@
 import 'package:chat_app/data/models/user.dart';
 import 'dart:convert';
 
-List<Message> messagesFromMap(List<dynamic> map) =>
-    List<Message>.from(map.map((x) => Message.fromMap(x)));
+const String tableMessage = 'messages';
+
+List<Message> messagesFromMap(List<dynamic> map,
+    [Message Function(Map<String, dynamic> map)? function]) {
+  function ??= Message.fromMap;
+  return List<Message>.from(map.map((x) => function!(x)));
+}
+
+class MessageFields {
+  static const String id = '_id';
+  static const String roomId = 'rid';
+  static const String userId = 'userId';
+  static const String msg = 'msg';
+  static const String type = 't';
+  static const String timestamp = 'ts';
+  static const String attachments = 'attachments';
+}
 
 enum Type {
   removedUserFromTeam,
@@ -41,6 +56,30 @@ class Message {
   List<Channel>? channels;
   List<Attachment>? attachments;
   Type? type;
+
+  String? typeToString() {
+    if (type == null) return null;
+    switch (type) {
+      case Type.addedUserToTeam:
+        return 'added-user-to-team';
+      case Type.removedUserFromTeam:
+        return 'removed-user-from-team';
+      case Type.userAddRoomToTeam:
+        return 'user-added-room-to-team';
+      case Type.userDeleteRoomFromTeam:
+        return 'user-deleted-room-from-team';
+      case Type.userLeftTeam:
+        return 'ult';
+      case Type.addedUserToRoom:
+        return 'au';
+      case Type.removedUserFromRoom:
+        return 'ru';
+      case Type.unknown:
+        return 'unknown';
+      default:
+        return 'unknown';
+    }
+  }
 
   factory Message.fromJson(String str) => Message.fromMap(json.decode(str));
 
@@ -104,11 +143,7 @@ class Attachment {
     this.title,
     this.titleLink,
     this.titleLinkDownload,
-    this.imageDimensions,
-    this.imagePreview,
     this.imageUrl,
-    this.imageType,
-    this.imageSize,
     this.type,
   });
 
@@ -116,11 +151,7 @@ class Attachment {
   String? title;
   String? titleLink;
   bool? titleLinkDownload;
-  ImageDimensions? imageDimensions;
-  String? imagePreview;
   String? imageUrl;
-  String? imageType;
-  int? imageSize;
   String? type;
 
   Attachment.fromMap(Map<String, dynamic> json)
@@ -129,27 +160,7 @@ class Attachment {
           title: json["title"],
           titleLink: json["title_link"],
           titleLinkDownload: json["title_link_download"],
-          // imageDimensions: ImageDimensions.fromMap(json["image_dimensions"]),
-          imagePreview: json["image_preview"],
           imageUrl: json["image_url"],
-          imageType: json["image_type"],
-          imageSize: json["image_size"],
           type: json["type"],
-        );
-}
-
-class ImageDimensions {
-  ImageDimensions({
-    this.width,
-    this.height,
-  });
-
-  int? width;
-  int? height;
-
-  ImageDimensions.fromMap(Map<String, dynamic> json)
-      : this(
-          width: json["width"],
-          height: json["height"],
         );
 }

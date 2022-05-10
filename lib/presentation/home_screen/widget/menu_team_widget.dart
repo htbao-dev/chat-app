@@ -116,7 +116,7 @@ class _MenuItemState extends State<_MenuItem> {
   Widget build(BuildContext context) {
     if (widget.imageUrl != null) {
       return CachedNetworkImage(
-          imageUrl: "widget.imageUrl!",
+          imageUrl: widget.imageUrl!,
           imageBuilder: (context, imageProvider) => Container(
               margin: const EdgeInsets.all(8.0),
               height: 50,

@@ -7,6 +7,8 @@ import 'package:chat_app/data/data_providers/api/room_provider.dart';
 import 'package:chat_app/data/data_providers/api/team_provider.dart';
 import 'package:chat_app/data/data_providers/local_storage/room_localstorage.dart';
 import 'package:chat_app/data/data_providers/local_storage/room_sqlite.dart';
+import 'package:chat_app/data/data_providers/local_storage/user_localstorage.dart';
+import 'package:chat_app/data/data_providers/local_storage/user_sqlite.dart';
 import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/user.dart';
 import 'package:chat_app/utils/static_data.dart';
@@ -16,8 +18,9 @@ class RoomRepository {
   final RoomProvider _roomProvider = RocketRoomProvider();
   final TeamProvider _teamProvider = RocketTeamProvider();
   final RoomLocalStorage _roomLocalStorage = RoomSqlite();
+  final UserLocalStorage _userLocalStorage = UserSqlite();
 
-  Future<Room> getGeneralRoom(String teamRoomId) async {
+  Future<Room> getGeneralRoom(String teamRoomId, String teamId) async {
     try {
       if (StaticData.internetStatus == InternetStatus.disconnected) {
         return _roomLocalStorage.getRoomInfo(teamRoomId);
@@ -88,19 +91,26 @@ class RoomRepository {
     String selector,
   ) async {
     try {
-      final auth = StaticData.auth!;
-      final String rawData;
-      if (room.type == Room.privateRoom) {
-        rawData = await _roomProvider.groupMembers(auth, selector, room.id);
+      if (StaticData.internetStatus == InternetStatus.connected) {
+        final auth = StaticData.auth!;
+        final String rawData;
+        if (room.type == Room.privateRoom) {
+          rawData = await _roomProvider.groupMembers(auth, selector, room.id);
+        } else {
+          rawData = await _roomProvider.channelMembers(auth, selector, room.id);
+        }
+        var decodeData = jsonDecode(rawData);
+        if (decodeData['success'] == true) {
+          final users = usersFromMap(decodeData['members']);
+          // await _userLocalStorage.saveUsers(users);
+          await _roomLocalStorage.saveListUserInRoom(users, room.id);
+          return users;
+        }
+        return [];
       } else {
-        rawData = await _roomProvider.channelMembers(auth, selector, room.id);
+        return _userLocalStorage.getUsersInRoom(room.id);
+        // return [];
       }
-      var decodeData = jsonDecode(rawData);
-      if (decodeData['success'] == true) {
-        final users = usersFromMap(decodeData['members']);
-        return users;
-      }
-      return [];
     } catch (e) {
       debugPrint(e.toString());
       return [];

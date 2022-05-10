@@ -3,6 +3,8 @@ import 'dart:io';
 
 import 'package:chat_app/data/data_providers/api/rocket_user_provider.dart';
 import 'package:chat_app/data/data_providers/api/user_provider.dart';
+import 'package:chat_app/data/data_providers/local_storage/user_localstorage.dart';
+import 'package:chat_app/data/data_providers/local_storage/user_sqlite.dart';
 import 'package:chat_app/data/models/auth.dart';
 import 'package:chat_app/data/models/user.dart';
 import 'package:chat_app/utils/static_data.dart';
@@ -10,6 +12,7 @@ import 'package:flutter/widgets.dart';
 
 class UserRepository {
   final UserProvider _userProvider = RocketUserProvider();
+  final UserLocalStorage _userLocalStorage = UserSqlite();
 
   Future<bool> setAvatar(File image) async {
     final auth = StaticData.auth!;
@@ -73,6 +76,20 @@ class UserRepository {
     } catch (e) {
       debugPrint(e.toString());
       return [];
+    }
+  }
+
+  Future<void> loadUsers() async {
+    try {
+      final auth = StaticData.auth!;
+      final rawData = await _userProvider.getUsers(auth: auth, selector: '');
+      var decodeData = jsonDecode(rawData);
+      if (decodeData['success'] == true) {
+        final users = usersFromMap(decodeData['items']);
+        await _userLocalStorage.saveUsers(users);
+      }
+    } catch (e) {
+      debugPrint(e.toString());
     }
   }
 }

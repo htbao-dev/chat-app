@@ -9,6 +9,8 @@ import 'package:chat_app/data/data_providers/local_storage/room_localstorage.dar
 import 'package:chat_app/data/data_providers/local_storage/room_sqlite.dart';
 import 'package:chat_app/data/data_providers/local_storage/team_localstorage.dart';
 import 'package:chat_app/data/data_providers/local_storage/team_sqlite.dart';
+import 'package:chat_app/data/data_providers/local_storage/user_localstorage.dart';
+import 'package:chat_app/data/data_providers/local_storage/user_sqlite.dart';
 import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/data/models/user.dart';
@@ -20,6 +22,7 @@ class TeamRepository {
   final RoomProvider _roomProvider = RocketRoomProvider();
   final RoomLocalStorage _roomLocalStorage = RoomSqlite();
   final TeamLocalStorage _teamLocalStorage = TeamSqlite();
+  final UserLocalStorage _userLocalStorage = UserSqlite();
 
   Future<bool> deleteTeam(Team team, List<Room> rooms) async {
     try {
@@ -208,14 +211,21 @@ class TeamRepository {
 
   Future<List<User>> listTeamMember(String teamRoomId) async {
     try {
-      final auth = StaticData.auth!;
-      final rawData = await _roomProvider.groupMembers(auth, null, teamRoomId);
-      var decodeData = jsonDecode(rawData);
-      if (decodeData['success'] == true) {
-        final users = usersFromMap(decodeData['members']);
+      if (StaticData.internetStatus == InternetStatus.connected) {
+        final auth = StaticData.auth!;
+        final rawData =
+            await _roomProvider.groupMembers(auth, null, teamRoomId);
+        var decodeData = jsonDecode(rawData);
+        if (decodeData['success'] == true) {
+          final users = usersFromMap(decodeData['members']);
+          await _roomLocalStorage.saveListUserInRoom(users, teamRoomId);
+          return users;
+        }
+        return [];
+      } else {
+        final users = await _userLocalStorage.getUsersInRoom(teamRoomId);
         return users;
       }
-      return [];
     } catch (e) {
       debugPrint(e.toString());
       return [];

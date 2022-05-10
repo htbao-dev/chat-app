@@ -33,6 +33,9 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   Stream<List<User>> get teamMemberStream => _teamMemberController.stream;
   Stream<List<User>> get selectStream => _selectStreamController.stream;
   Stream<List<User>> get roomMemberStream => _roomMemberController.stream;
+
+  List<User>? listRoomMember;
+
   RoomBloc({required this.teamBloc, required this.roomRepository})
       : super(RoomInitial()) {
     _messageStreamSub = teamBloc.messageStream.listen((event) {
@@ -54,6 +57,7 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   Future<void> selectRoom(SelectRoom event, emit) async {
     StaticData.roomIdForcus = event.room.id;
     emit(RoomSelected(room: event.room));
+    await listMemberInRoom(event.room);
   }
 
   Future<CreateRoomStatus> createRoom(
@@ -69,11 +73,10 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
     // emit(RoomCreated(room: room));
   }
 
-  List<User>? listRoomMember;
-  void listMemberInRoom(Room room) async {
+  Future<void> listMemberInRoom(Room room) async {
     listRoomMember ??= await roomRepository.searchMember(room, '');
     await Future.delayed(const Duration(milliseconds: 100));
-    _roomMemberController.sink.add(listRoomMember!);
+    if (listRoomMember != null) _roomMemberController.sink.add(listRoomMember!);
   }
 
   List<User> _listTeamMember = [];
