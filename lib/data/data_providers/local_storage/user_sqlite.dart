@@ -7,9 +7,17 @@ import 'package:sqflite/sqflite.dart';
 class UserSqlite implements UserLocalStorage {
   final SqliteCore _localDb = SqliteCore();
   @override
-  Future<User> getUser(String userId) {
-    // TODO: implement getUser
-    throw UnimplementedError();
+  Future<User?> getUser(String userId) async {
+    final Database db = await _localDb.database;
+    List<Map<String, dynamic>> maps = await db.query(
+      tableUser,
+      where: '${UserFields.id} = ?',
+      whereArgs: [userId],
+    );
+    if (maps.isNotEmpty) {
+      return _userFromDbMap(maps.first);
+    }
+    return null;
   }
 
   @override
@@ -17,7 +25,7 @@ class UserSqlite implements UserLocalStorage {
     var db = await _localDb.database;
     var batch = db.batch();
     for (var user in user) {
-      batch.insert(tableUser, _userToDbMap(user),
+      batch.insert(tableUser, _userToDbMap(user).remove(UserFields.email),
           conflictAlgorithm: ConflictAlgorithm.replace);
     }
     await batch.commit(noResult: true);
@@ -29,12 +37,6 @@ class UserSqlite implements UserLocalStorage {
   }
 
   @override
-  Future<User> getUsersOfRoom(String roomId) {
-    // TODO: implement getUsersOfRoom
-    throw UnimplementedError();
-  }
-
-  @override
   Future<List<User>> getUsersInRoom(String roomId) async {
     var db = await _localDb.database;
     var userQuery = await db.rawQuery(
@@ -42,6 +44,14 @@ class UserSqlite implements UserLocalStorage {
       [roomId],
     );
     return usersFromMap(userQuery, _userFromDbMap);
+  }
+
+  @override
+  Future<void> saveUser(User user) async {
+    var db = await _localDb.database;
+    final map = _userToDbMap(user);
+    await db.insert(tableUser, map,
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 }
 

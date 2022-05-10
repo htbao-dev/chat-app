@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:chat_app/constants/enums.dart';
 import 'package:chat_app/data/data_providers/api/rocket_user_provider.dart';
 import 'package:chat_app/data/data_providers/api/user_provider.dart';
 import 'package:chat_app/data/data_providers/local_storage/user_localstorage.dart';
@@ -29,9 +30,14 @@ class UserRepository {
 
   Future<User?> getUserInfo({required Auth auth}) async {
     try {
-      final response = await _userProvider.getUserInfo(auth: auth);
-      final user = User.fromMap(json.decode(response));
-      return user;
+      if (StaticData.internetStatus == InternetStatus.connected) {
+        final response = await _userProvider.getUserInfo(auth: auth);
+        final user = User.fromMap(json.decode(response));
+        await _userLocalStorage.saveUser(user);
+        return user;
+      } else {
+        return _userLocalStorage.getUser(auth.userId);
+      }
     } catch (e, s) {
       debugPrintStack(label: e.toString(), stackTrace: s);
       return null;

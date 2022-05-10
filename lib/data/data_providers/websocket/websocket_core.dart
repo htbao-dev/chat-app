@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:chat_app/data/data_providers/api/rocket_server.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
@@ -36,7 +37,7 @@ class Websocket extends RocketServer {
         _mapEvent(event);
       });
     } catch (e) {
-      print(e);
+      log(e.toString());
     }
   }
 
