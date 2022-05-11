@@ -144,7 +144,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     if (StaticData.internetStatus == InternetStatus.connected) {
       _socketAuth.connect(auth);
       _socketAuth.subcrNotifyUserMessage(auth);
-      userRepository.loadUsers();
+      userRepository.loadAllUsers();
     }
   }
 

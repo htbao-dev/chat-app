@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:bloc/bloc.dart';
 import 'package:chat_app/constants/values.dart';
@@ -112,6 +113,7 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
     if (ok) {
       listTeams = await teamRepository.listTeams();
       emit(TeamLoaded(teams: listTeams!));
+      add(DisplayTeam(team: null));
     }
     return ok;
   }
@@ -185,6 +187,9 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
 
   displayTeam(event, emit) {
     currentTeam = event.team;
+    if (currentTeam != null) {
+      loadTeamMember(event.team);
+    }
     emit(TeamDisplayed(team: event.team));
   }
 

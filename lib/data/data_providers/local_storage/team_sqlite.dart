@@ -1,6 +1,8 @@
 import 'package:chat_app/data/data_providers/local_storage/sqlite_core.dart';
 import 'package:chat_app/data/data_providers/local_storage/team_localstorage.dart';
+import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/team.dart';
+import 'package:chat_app/data/models/user.dart';
 import 'package:sqflite/sqlite_api.dart';
 
 class TeamSqlite implements TeamLocalStorage {
@@ -50,5 +52,27 @@ class TeamSqlite implements TeamLocalStorage {
   Future deleteTeams() async {
     final db = await _localDb.database;
     await db.delete(tableTeam);
+  }
+
+  @override
+  Future<void> deleteTeam(String teamId) async {
+    final db = await _localDb.database;
+    await db
+        .delete(tableTeam, where: '${TeamFields.id} = ?', whereArgs: [teamId]);
+  }
+
+  @override
+  void removeMemberFromTeam(User user, Team team, List<Room> rooms) async {
+    var db = await _localDb.database;
+    var batch = db.batch();
+    for (var room in rooms) {
+      batch.delete(tableRoomUser,
+          where: '$tableRoomUser_room = ? AND $tableRoomUser_user = ?',
+          whereArgs: [room.id, user.id]);
+    }
+    batch.delete(tableRoomUser,
+        where: '$tableRoomUser_room = ? AND $tableRoomUser_user = ?',
+        whereArgs: [team.roomId, user.id]);
+    await batch.commit(noResult: true);
   }
 }

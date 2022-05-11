@@ -33,6 +33,7 @@ class TeamRepository {
         final rawData = await _teamProvider.deleteTeam(auth, team, rooms);
         final json = jsonDecode(rawData);
         if (json['success'] == true) {
+          _teamLocalStorage.deleteTeams();
           return true;
         } else {
           return false;
@@ -54,6 +55,7 @@ class TeamRepository {
         final rawData = await _teamProvider.leaveTeam(auth, team, rooms);
         final json = jsonDecode(rawData);
         if (json['success'] == true) {
+          _teamLocalStorage.deleteTeams();
           return true;
         } else {
           return false;
@@ -77,6 +79,7 @@ class TeamRepository {
             await _teamProvider.removeMemberFromTeam(auth!, user, team, rooms);
         final decodeData = jsonDecode(rawData);
         if (decodeData['success'] == true) {
+          _teamLocalStorage.removeMemberFromTeam(user, team, rooms);
           return true;
         } else {
           return false;

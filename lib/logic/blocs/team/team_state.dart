@@ -23,7 +23,7 @@ class TeamDisplayed extends TeamState {
   TeamDisplayed({required this.team});
 
   @override
-  List<Object> get props => [if (team != null) team!];
+  List<Object> get props => [Random().nextInt(100)];
 }
 
 class TeamHaveMessage extends TeamState {

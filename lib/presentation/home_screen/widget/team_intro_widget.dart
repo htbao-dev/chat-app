@@ -88,8 +88,20 @@ class _Drawer extends StatelessWidget {
                       TextButton(
                         child: const Text('Yes'),
                         onPressed: () async {
+                          showDialog(
+                            context: context1,
+                            builder: (context1) => const AlertDialog(
+                              title: Text('Deleting...'),
+                              content: Text('Please wait...'),
+                              actions: [
+                                CircularProgressIndicator(),
+                              ],
+                            ),
+                          );
+
                           await BlocProvider.of<TeamBloc>(context)
                               .deleteTeam(team);
+                          Navigator.of(context1).pop();
                           Navigator.of(context1).pop();
                         },
                       ),

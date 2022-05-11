@@ -85,7 +85,7 @@ class UserRepository {
     }
   }
 
-  Future<void> loadUsers() async {
+  Future<void> loadAllUsers() async {
     try {
       final auth = StaticData.auth!;
       final rawData = await _userProvider.getUsers(auth: auth, selector: '');

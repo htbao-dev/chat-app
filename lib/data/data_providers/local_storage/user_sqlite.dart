@@ -25,14 +25,19 @@ class UserSqlite implements UserLocalStorage {
     var db = await _localDb.database;
     var batch = db.batch();
     for (var user in user) {
-      batch.insert(tableUser, _userToDbMap(user).remove(UserFields.email),
+      batch.insert(tableUser, _userToDbMap(user),
           conflictAlgorithm: ConflictAlgorithm.replace);
     }
     await batch.commit(noResult: true);
   }
 
-  Map<String, dynamic> _userToDbMap(User user) {
-    var map = user.toMap();
+  Map<String, Object?> _userToDbMap(User user) {
+    Map<String, Object?> map = {
+      UserFields.id: user.id,
+      UserFields.name: user.name,
+      UserFields.username: user.username,
+      UserFields.avatarUrl: user.avatarUrl,
+    };
     return map;
   }
 
@@ -49,7 +54,8 @@ class UserSqlite implements UserLocalStorage {
   @override
   Future<void> saveUser(User user) async {
     var db = await _localDb.database;
-    final map = _userToDbMap(user);
+    var map = _userToDbMap(user);
+    map['email'] = user.emails?.first.address;
     await db.insert(tableUser, map,
         conflictAlgorithm: ConflictAlgorithm.replace);
   }

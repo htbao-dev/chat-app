@@ -67,4 +67,19 @@ class RoomSqlite implements RoomLocalStorage {
     }
     await batch.commit(noResult: true);
   }
+
+  @override
+  Future deleteRoom(String roomId) async {
+    var db = await _localDb.database;
+    await db
+        .delete(tableRoom, where: '${RoomFields.id} = ?', whereArgs: [roomId]);
+  }
+
+  @override
+  void deleteUserInRoom(String userId, String roomId) async {
+    var db = await _localDb.database;
+    await db.delete(tableRoomUser,
+        where: '$tableRoomUser_room = ? AND $tableRoomUser_user = ?',
+        whereArgs: [roomId, userId]);
+  }
 }

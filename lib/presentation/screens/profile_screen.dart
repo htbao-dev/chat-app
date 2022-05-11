@@ -25,8 +25,22 @@ class ProfileScreen extends StatelessWidget {
             stream: BlocProvider.of<AuthBloc>(context).userStream,
             builder: (context, snapshot) {
               if (snapshot.data == null) {
-                return const Scaffold(
-                  body: Center(
+                return Scaffold(
+                  appBar: AppBar(
+                    title: const Text('Profile'),
+                    actions: [
+                      IconButton(
+                        icon: const Icon(Icons.exit_to_app),
+                        onPressed: () async {
+                          final bool confirm = await _confirm(context);
+                          if (confirm) {
+                            BlocProvider.of<AuthBloc>(context).add(Logout());
+                          }
+                        },
+                      )
+                    ],
+                  ),
+                  body: const Center(
                     child: CircularProgressIndicator(),
                   ),
                 );
@@ -36,5 +50,26 @@ class ProfileScreen extends StatelessWidget {
             });
       },
     );
+  }
+
+  Future<bool> _confirm(BuildContext context) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: const Text('Are you sure?'),
+            content: const Text('Do you want to exit?'),
+            actions: <Widget>[
+              TextButton(
+                child: const Text('No'),
+                onPressed: () => Navigator.pop(context, false),
+              ),
+              TextButton(
+                child: const Text('Yes'),
+                onPressed: () => Navigator.pop(context, true),
+              ),
+            ],
+          ),
+        ) ??
+        false;
   }
 }

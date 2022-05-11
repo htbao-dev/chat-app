@@ -6,5 +6,8 @@ abstract class RoomLocalStorage {
   Future saveListUserInRoom(List<User> users, String roomId);
   Future<List<Room>> listRooms(String teamId);
   Future saveRoom(Room room, {String? teamId});
+  Future deleteRoom(String roomId);
   Future<Room> getRoomInfo(String roomId);
+
+  void deleteUserInRoom(String userId, String roomId);
 }

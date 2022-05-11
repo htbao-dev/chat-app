@@ -144,6 +144,7 @@ class RoomRepository {
       }
       var decodeData = jsonDecode(rawData);
       if (decodeData['success'] == true) {
+        _roomLocalStorage.deleteRoom(room.id);
         return true;
       }
       return false;
@@ -179,6 +180,7 @@ class RoomRepository {
       }
       var decodeData = jsonDecode(rawData);
       if (decodeData['success'] == true) {
+        _roomLocalStorage.deleteUserInRoom(userId, room.id);
         return true;
       }
       return false;
