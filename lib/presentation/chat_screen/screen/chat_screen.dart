@@ -1,3 +1,4 @@
+import 'package:chat_app/constants/routes.dart';
 import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/logic/blocs/chat/chat_bloc.dart';
@@ -30,13 +31,20 @@ class ChatScreen extends StatelessWidget {
       )..add(
           LoadHistory(roomId: room.id),
         ),
-      child: Scaffold(
-        // resizeToAvoidBottomInset: false,
-        appBar: _appBar(),
-        body: _body(),
-        endDrawer: Drawer(
-          child: _Drawer(team: team, roomBloc: roomBloc, room: room),
-          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      child: BlocListener<ChatBloc, ChatState>(
+        listener: (context, state) {
+          if (state is RoomRemoved) {
+            Navigator.popUntil(context, (route) => route.isFirst);
+          }
+        },
+        child: Scaffold(
+          // resizeToAvoidBottomInset: false,
+          appBar: _appBar(),
+          body: _body(),
+          endDrawer: Drawer(
+            child: _Drawer(team: team, roomBloc: roomBloc, room: room),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          ),
         ),
       ),
     );
@@ -104,9 +112,6 @@ class _Drawer extends StatelessWidget {
                       child: const Text('Delete'),
                       onPressed: () async {
                         await roomBloc.deleteRoom(room);
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
                       },
                     ),
                   ],
@@ -138,11 +143,8 @@ class _Drawer extends StatelessWidget {
                       child: const Text('Leave'),
                       onPressed: () async {
                         await roomBloc.leaveRoom(room: room);
-                        roomBloc.add(LoadRooms(
-                            teamId: team.id, teamRoomId: team.roomId));
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
-                        Navigator.of(context).pop();
+                        // roomBloc.add(LoadRooms(
+                        //     teamId: team.id, teamRoomId: team.roomId));
                       },
                     ),
                   ],

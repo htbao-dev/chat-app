@@ -1,14 +1,21 @@
 import 'package:chat_app/data/models/team.dart';
 import 'package:chat_app/data/repositories/room_repository.dart';
 import 'package:chat_app/logic/blocs/room/room_bloc.dart';
+import 'package:chat_app/logic/blocs/team/team_bloc.dart';
 import 'package:chat_app/utils/static_data.dart';
 import 'package:chat_app/utils/validation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NewRoomScreen extends StatefulWidget {
   final RoomBloc roomBloc;
   final Team team;
-  const NewRoomScreen({Key? key, required this.roomBloc, required this.team})
+  final TeamBloc teamBloc;
+  const NewRoomScreen(
+      {Key? key,
+      required this.roomBloc,
+      required this.team,
+      required this.teamBloc})
       : super(key: key);
 
   @override
@@ -78,6 +85,7 @@ class _NewRoomScreenState extends State<NewRoomScreen> {
                       Navigator.pop(context);
 
                       if (status == CreateRoomStatus.success) {
+                        widget.teamBloc.loadRooms(team: widget.team);
                         Navigator.pop(context);
                       } else if (status == CreateRoomStatus.duplicateName) {
                         setState(() {

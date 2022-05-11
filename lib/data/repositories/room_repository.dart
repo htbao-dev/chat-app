@@ -17,23 +17,40 @@ import 'package:flutter/widgets.dart';
 class RoomRepository {
   final RoomProvider _roomProvider = RocketRoomProvider();
   final TeamProvider _teamProvider = RocketTeamProvider();
-  final RoomLocalStorage _roomLocalStorage = RoomSqlite();
+  final RoomLocalStorage roomLocalStorage = RoomSqlite();
   final UserLocalStorage _userLocalStorage = UserSqlite();
 
   Future<Room> getGeneralRoom(String teamRoomId, String teamId) async {
     try {
       if (StaticData.internetStatus == InternetStatus.disconnected) {
-        return _roomLocalStorage.getRoomInfo(teamRoomId);
+        return roomLocalStorage.getRoomInfo(teamRoomId);
       } else {
         final auth = StaticData.auth!;
         final rawData = await _roomProvider.getRoomInfo(auth, teamRoomId);
         var decodeData = jsonDecode(rawData);
         final room = Room.fromJson(decodeData['room']);
-        _roomLocalStorage.saveRoom(room, teamId: teamRoomId);
+        roomLocalStorage.saveRoom(room, teamId: teamRoomId);
         return room;
       }
     } catch (_) {
-      return _roomLocalStorage.getRoomInfo(teamRoomId);
+      return roomLocalStorage.getRoomInfo(teamRoomId);
+    }
+  }
+
+  Future<Room> getRoom(String roomId) async {
+    try {
+      if (StaticData.internetStatus == InternetStatus.disconnected) {
+        return roomLocalStorage.getRoomInfo(roomId);
+      } else {
+        final auth = StaticData.auth!;
+        final rawData = await _roomProvider.getRoomInfo(auth, roomId);
+        var decodeData = jsonDecode(rawData);
+        final room = Room.fromJson(decodeData['room']);
+        roomLocalStorage.saveRoom(room, teamId: room.teamId);
+        return room;
+      }
+    } catch (_) {
+      return roomLocalStorage.getRoomInfo(roomId);
     }
   }
 
@@ -103,7 +120,7 @@ class RoomRepository {
         if (decodeData['success'] == true) {
           final users = usersFromMap(decodeData['members']);
           // await _userLocalStorage.saveUsers(users);
-          await _roomLocalStorage.saveListUserInRoom(users, room.id);
+          await roomLocalStorage.saveListUserInRoom(users, room.id);
           return users;
         }
         return [];
@@ -144,7 +161,7 @@ class RoomRepository {
       }
       var decodeData = jsonDecode(rawData);
       if (decodeData['success'] == true) {
-        _roomLocalStorage.deleteRoom(room.id);
+        roomLocalStorage.deleteRoom(room.id);
         return true;
       }
       return false;
@@ -160,6 +177,7 @@ class RoomRepository {
       final rawData = await _roomProvider.leaveRoom(auth, room.id);
       var decodeData = jsonDecode(rawData);
       if (decodeData['success'] == true) {
+        await roomLocalStorage.deleteRoom(room.id);
         return true;
       }
       return false;
@@ -180,7 +198,7 @@ class RoomRepository {
       }
       var decodeData = jsonDecode(rawData);
       if (decodeData['success'] == true) {
-        _roomLocalStorage.deleteUserInRoom(userId, room.id);
+        roomLocalStorage.deleteUserInRoom(userId, room.id);
         return true;
       }
       return false;

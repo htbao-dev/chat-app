@@ -40,3 +40,8 @@ class MessageReceive extends ChatState {
   @override
   List<Object> get props => [message];
 }
+
+class RoomRemoved extends ChatState {
+  @override
+  List<Object> get props => [];
+}

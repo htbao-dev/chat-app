@@ -18,6 +18,8 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   late final int _roomMessageStreamId;
 
   late final StreamSubscription _roomMessageStreamSub;
+  late final StreamSubscription _changedSub;
+
   final MessageRepository messageRepository = MessageRepository();
   ChatBloc({required this.room}) : super(MessageInitial()) {
     _roomMessageStreamId = chatSocket.subStreamRoomMessage(room.id);
@@ -25,6 +27,17 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
       Message message = Message.fromMap(event['fields']['args'][0]);
       emit(MessageReceive(message: message));
     });
+    _changedSub = chatSocket.changedSubStream.listen((event) {
+      if (event['fields']['args'][0] == 'removed') {
+        final String removedRoomId = event['fields']['args'][1]['rid'];
+        if (StaticData.roomIdForcus == removedRoomId) {
+          add(RemoveRoom());
+        }
+      }
+    });
+    on<RemoveRoom>(((event, emit) {
+      emit(RoomRemoved());
+    }));
     on<LoadHistory>(loadHistory);
     on<SendMessage>(sendMessage);
     on<OpenGallery>(openGallery);
@@ -82,6 +95,7 @@ class ChatBloc extends Bloc<ChatEvent, ChatState> {
   @override
   Future<void> close() {
     StaticData.roomIdForcus = null;
+    _changedSub.cancel();
     chatSocket.unsubStreamRoomMessage(_roomMessageStreamId);
     _roomMessageStreamSub.cancel();
     return super.close();

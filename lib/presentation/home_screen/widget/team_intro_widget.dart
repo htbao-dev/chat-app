@@ -27,7 +27,7 @@ class TeamIntroWidget extends StatelessWidget {
       builder: (context, state) {
         if (state is TeamDisplayed) {
           if (state.team != null) {
-            BlocProvider.of<TeamBloc>(context).listTeamMember = null;
+            // BlocProvider.of<TeamBloc>(context).listTeamMember = null;
             return Scaffold(
               backgroundColor: Theme.of(context).backgroundColor,
               appBar: AppBar(
@@ -45,7 +45,28 @@ class TeamIntroWidget extends StatelessWidget {
             return Container();
           }
         }
-        return Container();
+        return Container(
+          alignment: const Alignment(0, -0.4),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Transform.scale(
+                scale: 1.0,
+                child: Transform.translate(
+                    child: Image.asset('assets/images/logo2.png'),
+                    offset: const Offset(-40, 0)),
+              ),
+              const SizedBox(height: 30),
+              const Text(
+                'Click "Add" button to create new team',
+                style: TextStyle(
+                  fontSize: 15,
+                ),
+                maxLines: 2,
+              ),
+            ],
+          ),
+        );
       },
     );
   }
@@ -125,6 +146,7 @@ class _Drawer extends StatelessWidget {
                         contentPadding: const EdgeInsets.all(20),
                         content: NewRoomScreen(
                           roomBloc: BlocProvider.of<RoomBloc>(context),
+                          teamBloc: BlocProvider.of<TeamBloc>(context),
                           team: team,
                         ),
                       );

@@ -15,7 +15,8 @@ class RocketTeamProvider extends RocketServer implements TeamProvider {
   final _setRoomAutoJoinRoute = '/api/v1/teams.updateRoom';
   final _listMemberRoute = '/api/v1/teams.members';
   final _removeMemberFromTeamRoute = '/api/v1/teams.removeMember';
-  final _listRoomRoute = '/api/v1/teams.listRooms';
+  // final _listRoomRoute = '/api/v1/teams.listRooms';
+  final _listRoomRoute = '/api/v1/teams.listRoomsOfUser';
   final _leaveTeamRoute = '/api/v1/teams.leave';
   final _deleteTeamRoute = '/api/v1/teams.delete';
   @override
@@ -132,7 +133,9 @@ class RocketTeamProvider extends RocketServer implements TeamProvider {
   @override
   Future<String> listRooms(
       Auth auth, String teamId, String? filter, String? type) async {
-    String uri = '$serverAddr$_listRoomRoute?teamId=$teamId';
+    String uri =
+        '$serverAddr$_listRoomRoute?teamId=$teamId&userId=${auth.userId}';
+    // String uri = '$serverAddr$_listRoomRoute?teamId=$teamId';
     if (filter != null) {
       uri += '&filter=$filter';
     }

@@ -6,6 +6,7 @@ class ChatSocket {
   final _coreSocket = Websocket();
 
   Stream get roomMessageStream => _coreSocket.roomMessageStream;
+  Stream get changedSubStream => _coreSocket.subChangedStream;
 
   int subStreamRoomMessage(String roomId) {
     final int id = StaticData.idRandom;

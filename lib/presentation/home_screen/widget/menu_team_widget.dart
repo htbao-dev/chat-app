@@ -66,23 +66,25 @@ class _ListTeam extends StatelessWidget {
       builder: (context, state) {
         if (state is TeamLoaded) {
           final listTeam = state.teams;
-          return Column(
-            children: [
-              Divider(
-                color: Theme.of(context).primaryColor,
-                thickness: 1,
-                indent: 8,
-                endIndent: 8,
-              ),
-              ListView.builder(
-                shrinkWrap: true,
-                itemCount: listTeam.length,
-                itemBuilder: (context, index) {
-                  return _teamItem(context, listTeam[index]);
-                },
-              ),
-            ],
-          );
+          if (listTeam.isNotEmpty) {
+            return Column(
+              children: [
+                Divider(
+                  color: Theme.of(context).primaryColor,
+                  thickness: 1,
+                  indent: 8,
+                  endIndent: 8,
+                ),
+                ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: listTeam.length,
+                  itemBuilder: (context, index) {
+                    return _teamItem(context, listTeam[index]);
+                  },
+                ),
+              ],
+            );
+          }
         }
         return Container();
       },

@@ -13,7 +13,7 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    BlocProvider.of<TeamBloc>(context).add(LoadTeam());
+    BlocProvider.of<TeamBloc>(context).add(LoadTeam(isLoadNew: true));
     return BlocProvider(
       create: (context) => RoomBloc(
           roomRepository: RepositoryProvider.of<RoomRepository>(context),

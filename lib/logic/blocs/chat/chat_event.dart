@@ -24,3 +24,5 @@ class SendMessage extends ChatEvent {
 class OpenGallery extends ChatEvent {}
 
 class OpenCamera extends ChatEvent {}
+
+class RemoveRoom extends ChatEvent {}

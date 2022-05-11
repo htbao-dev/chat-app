@@ -12,6 +12,7 @@ import 'package:chat_app/data/repositories/room_repository.dart';
 import 'package:chat_app/data/repositories/team_repository.dart';
 import 'package:chat_app/data/repositories/user_repository.dart';
 import 'package:chat_app/logic/blocs/room/room_bloc.dart';
+import 'package:chat_app/utils/static_data.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 
@@ -156,29 +157,52 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
   }
 
   void _onSubChanged(event) async {
+    print(event);
     if (event['fields']['args'][0] == 'inserted') {
-      listTeams = null;
-      await Future.delayed(const Duration(seconds: 1)); //delay for server
-      add(LoadTeam());
+      await Future.delayed(const Duration(seconds: 2)); //delay for server
+      add(LoadTeam(isLoadNew: true));
+      if (currentTeam != null) loadRooms(team: currentTeam!);
     } else if (event['fields']['args'][0] == 'removed') {
       final String removedRoomId = event['fields']['args'][1]['rid'];
       if (currentTeam?.roomId == removedRoomId) {
         currentTeam = null;
+        add(DisplayTeam(team: currentTeam));
       }
+
       for (Team team in listTeams ?? []) {
         if (team.roomId == removedRoomId) {
           listTeams!.remove(team);
-          add(LoadTeam());
-          break;
+          add(LoadTeam(isLoadNew: true));
+          return;
+        }
+      }
+      await roomRepository.roomLocalStorage.deleteRoom(removedRoomId);
+      if (listRoomTeam != null) {
+        for (final room in listRoomTeam!.publicRooms) {
+          if (room.id == removedRoomId) {
+            listRoomTeam!.publicRooms.remove(room);
+            _listRoomController.sink.add(listRoomTeam!);
+            return;
+          }
+        }
+        for (final room in listRoomTeam!.privateRooms) {
+          if (room.id == removedRoomId) {
+            listRoomTeam!.privateRooms.remove(room);
+            _listRoomController.sink.add(listRoomTeam!);
+            return;
+          }
         }
       }
     }
-    add(DisplayTeam(team: currentTeam));
   }
 
-  loadTeam(event, emit) async {
+  loadTeam(LoadTeam event, emit) async {
     try {
-      listTeams ??= await teamRepository.listTeams();
+      if (event.isLoadNew) {
+        listTeams = await teamRepository.listTeams();
+      } else {
+        listTeams ??= await teamRepository.listTeams();
+      }
       emit(TeamLoaded(teams: listTeams!));
     } catch (e) {
       debugPrint(e.toString());
@@ -187,7 +211,9 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
 
   displayTeam(event, emit) {
     currentTeam = event.team;
+
     if (currentTeam != null) {
+      listTeamMember = null;
       loadTeamMember(event.team);
     }
     emit(TeamDisplayed(team: event.team));

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:bloc/bloc.dart';
+import 'package:chat_app/data/data_providers/websocket/team_socket.dart';
 import 'package:chat_app/data/models/message.dart';
 import 'package:chat_app/data/models/room.dart';
 import 'package:chat_app/data/models/user.dart';
@@ -18,6 +19,7 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   final RoomRepository roomRepository;
   final TeamRepository teamRepository = TeamRepository();
   final TeamBloc teamBloc;
+  final TeamSocket socket = TeamSocket();
 
   final StreamController<List<User>> _roomMemberController =
       StreamController<List<User>>.broadcast();
@@ -29,6 +31,7 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
       StreamController<List<User>>.broadcast();
 
   late final StreamSubscription _messageStreamSub;
+  late final StreamSubscription _changedSub;
 
   Stream<List<User>> get teamMemberStream => _teamMemberController.stream;
   Stream<List<User>> get selectStream => _selectStreamController.stream;
@@ -42,7 +45,15 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
       emit(RoomReceiveMessage(message: event));
       // _messageController.sink.add(event);
     });
+    _changedSub = socket.subChangedStream.listen(subChanged);
     on<SelectRoom>(selectRoom);
+  }
+
+  void subChanged(event) async {
+    final String roomId = event['fields']['args'][1]['rid'];
+    if (event['fields']['args'][0] == 'inserted') {
+      roomRepository.getRoom(roomId);
+    }
   }
 
   Future<void> leaveRoom({required Room room}) async {

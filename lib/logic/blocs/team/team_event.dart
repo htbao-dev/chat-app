@@ -4,6 +4,9 @@ part of 'team_bloc.dart';
 abstract class TeamEvent extends Equatable {}
 
 class LoadTeam extends TeamEvent {
+  final bool isLoadNew;
+
+  LoadTeam({required this.isLoadNew});
   @override
   List<Object> get props => [];
 }

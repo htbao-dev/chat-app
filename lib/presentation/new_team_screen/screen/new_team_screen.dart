@@ -50,7 +50,7 @@ class _NewTeamScreenState extends State<NewTeamScreen> {
                       final status = await widget.teamBloc
                           .createTeam(name: _textEditingController.text);
                       if (status == CreateTeamStatus.success) {
-                        widget.teamBloc.add(LoadTeam());
+                        widget.teamBloc.add(LoadTeam(isLoadNew: true));
                         Navigator.pop(context);
                       } else if (status == CreateTeamStatus.duplicateName) {
                         setState(() {

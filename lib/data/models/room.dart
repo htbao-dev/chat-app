@@ -19,13 +19,14 @@ class Room {
   String name;
   String description;
   String type;
+  String teamId;
 
-  Room({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.type,
-  });
+  Room(
+      {required this.id,
+      required this.name,
+      required this.description,
+      required this.type,
+      required this.teamId});
 
   factory Room.fromJson(Map<String, dynamic> json) {
     return Room(
@@ -33,6 +34,7 @@ class Room {
       name: json['name'],
       description: json['description'],
       type: json['t'],
+      teamId: json['teamId'],
     );
   }
 }
