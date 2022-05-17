@@ -25,7 +25,7 @@ class NotificationApi {
           'channelId',
           'channelName',
           importance: Importance.max,
-          // priority: Priority.High,
+          priority: Priority.max,
           // ticker: 'ticker',
         ),
         iOS: IOSNotificationDetails());
