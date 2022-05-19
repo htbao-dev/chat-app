@@ -12,7 +12,6 @@ import 'package:chat_app/data/repositories/room_repository.dart';
 import 'package:chat_app/data/repositories/team_repository.dart';
 import 'package:chat_app/data/repositories/user_repository.dart';
 import 'package:chat_app/logic/blocs/room/room_bloc.dart';
-import 'package:chat_app/utils/static_data.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter/widgets.dart';
 
@@ -157,7 +156,6 @@ class TeamBloc extends Bloc<TeamEvent, TeamState> {
   }
 
   void _onSubChanged(event) async {
-    print(event);
     if (event['fields']['args'][0] == 'inserted') {
       await Future.delayed(const Duration(seconds: 2)); //delay for server
       add(LoadTeam(isLoadNew: true));

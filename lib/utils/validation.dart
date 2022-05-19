@@ -47,7 +47,6 @@ bool validateEmail(String? email) {
   return true;
 }
 
-//TODO: regex VN
 bool validateName(String? name) {
   if (name == null || name.isEmpty) {
     return false;

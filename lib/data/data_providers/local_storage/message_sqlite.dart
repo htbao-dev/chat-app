@@ -9,7 +9,6 @@ class MessageSqlite implements MessageLocalStorage {
 
   @override
   Future<void> clearMessages() {
-    // TODO: implement clearMessages
     throw UnimplementedError();
   }
 

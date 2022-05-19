@@ -150,6 +150,7 @@ class RoomBloc extends Bloc<RoomEvent, RoomState> {
   @override
   Future<void> close() {
     _messageStreamSub.cancel();
+    _changedSub.cancel();
     _roomMemberController.close();
     _teamMemberController.close();
     _selectStreamController.close();

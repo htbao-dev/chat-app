@@ -27,6 +27,7 @@ enum Type {
   userLeftTeam,
   addedUserToRoom,
   removedUserFromRoom,
+  userLeaveRoom,
   unknown
 }
 
@@ -74,6 +75,8 @@ class Message {
         return 'au';
       case Type.removedUserFromRoom:
         return 'ru';
+      case Type.userLeaveRoom:
+        return 'ul';
       case Type.unknown:
         return 'unknown';
       default:
@@ -101,6 +104,8 @@ class Message {
         type = Type.addedUserToRoom;
       } else if (map['t'] == 'ru') {
         type = Type.removedUserFromRoom;
+      } else if (map['t'] == 'ul') {
+        type = Type.userLeaveRoom;
       } else {
         type = Type.unknown;
       }

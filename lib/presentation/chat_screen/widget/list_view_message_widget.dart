@@ -168,6 +168,9 @@ class _ListViewMessageState extends State<ListViewMessage> {
         case Type.removedUserFromRoom:
           messageText = '${message.msg} removed from room';
           break;
+        case Type.userLeaveRoom:
+          messageText = '${message.msg} leave room';
+          break;
         case Type.unknown:
           messageText = 'unknown ${message.msg}';
           break;

@@ -5,7 +5,6 @@ import 'package:chat_app/logic/blocs/team/team_bloc.dart';
 import 'package:chat_app/utils/static_data.dart';
 import 'package:chat_app/utils/validation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 
 class NewRoomScreen extends StatefulWidget {
   final RoomBloc roomBloc;
